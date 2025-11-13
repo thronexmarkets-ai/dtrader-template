@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 import TradeParamsFooter from '../trade-params-footer';
@@ -9,15 +10,15 @@ jest.mock('@deriv/core/src/App/Components/Layout/Footer/network-status', () => {
 jest.mock('../date-time', () => {
     return jest.fn(() => (
         <div data-testid='date-time'>
-            <div className='trade-params-footer__date'>01 Jan 2024</div>
-            <div className='trade-params-footer__time'>12:00:00 GMT</div>
+            <div className='trade-params-v1-footer__date'>01 Jan 2024</div>
+            <div className='trade-params-v1-footer__time'>12:00:00 GMT</div>
         </div>
     ));
 });
 
-jest.mock('../toggle-fullscreen', () => {
-    return jest.fn(() => <button data-testid='toggle-fullscreen'>Toggle Fullscreen</button>);
-});
+jest.mock('../toggle-fullscreen', () => ({
+    ToggleFullScreen: jest.fn(() => <button data-testid='toggle-fullscreen'>Toggle Fullscreen</button>),
+}));
 
 describe('TradeParamsFooter', () => {
     it('should render all child components', () => {
@@ -32,7 +33,7 @@ describe('TradeParamsFooter', () => {
         const { container } = render(<TradeParamsFooter />);
 
         // eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-        const footerElement = container.querySelector('.trade-params-footer');
+        const footerElement = container.querySelector('.trade-params-v1-footer');
         expect(footerElement).toBeInTheDocument();
     });
 

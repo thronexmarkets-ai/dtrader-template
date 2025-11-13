@@ -182,7 +182,7 @@ const Trade = observer(() => {
         [open_market, try_synthetic_indices, try_open_markets]
     );
 
-    const form_wrapper_class = isMobile ? 'mobile-wrapper' : 'trade-params';
+    const form_wrapper_class = isMobile ? 'mobile-wrapper' : 'trade-params-v1';
     const chart_height_offset = React.useMemo(() => {
         if (is_accumulator) return '295px';
         if (is_turbos) return '300px';

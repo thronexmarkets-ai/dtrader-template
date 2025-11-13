@@ -38,8 +38,8 @@ const DateTime: React.FC = React.memo(() => {
 
     return (
         <>
-            <div className='trade-params-footer__date'>{formatDate(currentTime)}</div>
-            <div className='trade-params-footer__time'>{formatTime(currentTime)}</div>
+            <div className='trade-params-v1-footer__date'>{formatDate(currentTime)}</div>
+            <div className='trade-params-v1-footer__time'>{formatTime(currentTime)}</div>
         </>
     );
 });

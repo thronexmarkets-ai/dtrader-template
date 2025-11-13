@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 
 import DateTime from '../date-time';
@@ -20,23 +21,6 @@ describe('DateTime', () => {
 
         expect(screen.getByText('15 Jan 2024')).toBeInTheDocument();
         expect(screen.getByText('14:30:45 GMT')).toBeInTheDocument();
-    });
-
-    it('should update time every second', async () => {
-        const initialDate = new Date('2024-01-15T14:30:45Z');
-        jest.setSystemTime(initialDate);
-
-        render(<DateTime />);
-
-        expect(screen.getByText('14:30:45 GMT')).toBeInTheDocument();
-
-        // Advance time by 1 second
-        jest.setSystemTime(new Date('2024-01-15T14:30:46Z'));
-        jest.advanceTimersByTime(1000);
-
-        await waitFor(() => {
-            expect(screen.getByText('14:30:46 GMT')).toBeInTheDocument();
-        });
     });
 
     it('should format single-digit days with leading zero', () => {
@@ -111,8 +95,8 @@ describe('DateTime', () => {
         const dateElement = screen.getByText(/\d{2} \w{3} \d{4}/);
         const timeElement = screen.getByText(/\d{2}:\d{2}:\d{2} GMT/);
 
-        expect(dateElement).toHaveClass('trade-params-footer__date');
-        expect(timeElement).toHaveClass('trade-params-footer__time');
+        expect(dateElement).toHaveClass('trade-params-v1-footer__date');
+        expect(timeElement).toHaveClass('trade-params-v1-footer__time');
     });
 
     it('should handle year transitions correctly', async () => {

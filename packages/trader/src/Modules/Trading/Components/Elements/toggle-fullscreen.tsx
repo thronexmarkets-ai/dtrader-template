@@ -1,6 +1,5 @@
 import React from 'react';
 import classNames from 'classnames';
-import PropTypes from 'prop-types';
 
 import { Popover } from '@deriv/components';
 import { LegacyFullscreen1pxIcon, LegacyRestore1pxIcon } from '@deriv/quill-icons';
@@ -13,12 +12,16 @@ const fullscreen_map = {
     fnc_exit: ['exitFullscreen', 'webkitExitFullscreen', 'mozCancelFullScreen', 'msExitFullscreen'],
 };
 
-const ToggleFullScreen = ({ showPopover }) => {
+type TToggleFullScreenProps = {
+    showPopover?: boolean;
+};
+
+const ToggleFullScreen: React.FC<TToggleFullScreenProps> = ({ showPopover }) => {
     const { localize } = useTranslations();
     const [is_full_screen, setIsFullScreen] = React.useState(false);
 
     const onFullScreen = React.useCallback(() => {
-        setIsFullScreen(fullscreen_map.element.some(el => document[el]));
+        setIsFullScreen(fullscreen_map.element.some(el => document[el as keyof Document]));
     }, []);
 
     React.useEffect(() => {
@@ -32,15 +35,15 @@ const ToggleFullScreen = ({ showPopover }) => {
         };
     }, [onFullScreen]);
 
-    const toggleFullScreen = e => {
+    const toggleFullScreen = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.stopPropagation();
 
         const to_exit = is_full_screen;
         const el = to_exit ? document : document.documentElement;
-        const fncToCall = fullscreen_map[to_exit ? 'fnc_exit' : 'fnc_enter'].find(fnc => el[fnc]);
+        const fncToCall = fullscreen_map[to_exit ? 'fnc_exit' : 'fnc_enter'].find(fnc => el[fnc as keyof typeof el]);
 
         if (fncToCall) {
-            el[fncToCall]();
+            (el[fncToCall as keyof typeof el] as () => void)();
         } else {
             setIsFullScreen(false); // fullscreen API is not enabled
         }
@@ -72,7 +75,7 @@ const ToggleFullScreen = ({ showPopover }) => {
                 <Popover
                     alignment='top'
                     message={is_full_screen ? localize('Exit') : localize('Full screen')}
-                    zIndex={9999}
+                    zIndex='9999'
                 >
                     {fullScreenIcon}
                 </Popover>
@@ -81,10 +84,6 @@ const ToggleFullScreen = ({ showPopover }) => {
             )}
         </a>
     );
-};
-
-ToggleFullScreen.propTypes = {
-    showPopover: PropTypes.bool,
 };
 
 export { ToggleFullScreen };

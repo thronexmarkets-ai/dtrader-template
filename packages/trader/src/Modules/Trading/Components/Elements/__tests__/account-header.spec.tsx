@@ -1,3 +1,4 @@
+import React from 'react';
 import { redirectToLogin } from '@deriv/shared';
 import { mockStore, StoreProvider } from '@deriv/stores';
 import { render, screen } from '@testing-library/react';

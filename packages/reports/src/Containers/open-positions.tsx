@@ -75,8 +75,8 @@ const getOpenPositionsTotals = (
             purchase += Number(portfolio_pos.purchase);
             if (portfolio_pos.contract_info) {
                 const prices = {
-                    bid_price: portfolio_pos.contract_info.bid_price ?? 0,
-                    buy_price: portfolio_pos.contract_info.buy_price ?? 0,
+                    bid_price: portfolio_pos.contract_info.bid_price ?? '0',
+                    buy_price: portfolio_pos.contract_info.buy_price ?? '0',
                 };
                 profit += getTotalProfit(prices);
 

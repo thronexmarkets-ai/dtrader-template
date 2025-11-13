@@ -10,6 +10,7 @@ import ChartLoader from 'App/Components/Elements/chart-loader';
 import TraderProviders from '../../../../trader-providers';
 import Trader from '../trade';
 
+jest.mock('App/Components/Layout/Sidebar', () => jest.fn(() => <div>Sidebar</div>));
 jest.mock('App/Components/Elements/PositionsDrawer', () => jest.fn(() => <div>PositionsDrawer</div>));
 jest.mock('../trade-chart', () => jest.fn(() => <div>TradeChart</div>));
 jest.mock('../../Components/Form/form-layout', () => jest.fn(() => <div>FormLayout</div>));
@@ -26,11 +27,13 @@ type TMockTrader = {
     rootStore: TCoreStores;
 };
 
-const MockTrader = ({ rootStore }: TMockTrader) => (
-    <TraderProviders store={rootStore}>
-        <Trader />
-    </TraderProviders>
-);
+const MockTrader = ({ rootStore }: TMockTrader) => {
+    return (
+        <TraderProviders store={rootStore}>
+            <Trader />
+        </TraderProviders>
+    );
+};
 
 describe('Trader', () => {
     let rootStore: TCoreStores;
@@ -82,7 +85,7 @@ describe('Trader', () => {
 
     it('renders the trader component in desktop view', () => {
         render(<MockTrader rootStore={rootStore} />);
-        expect(screen.getByText('PositionsDrawer')).toBeInTheDocument();
+        expect(screen.getByText('Sidebar')).toBeInTheDocument();
         expect(screen.queryByTestId('dt_swipeable')).not.toBeInTheDocument();
         expect(screen.getByText('TradeChart')).toBeInTheDocument();
         expect(screen.getByText('FormLayout')).toBeInTheDocument();

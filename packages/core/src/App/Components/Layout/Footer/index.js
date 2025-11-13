@@ -3,7 +3,6 @@ import NetworkStatus from './network-status';
 
 export default NetworkStatus;
 export * from './endpoint-note.jsx';
-export * from './toggle-fullscreen.jsx';
 export * from './toggle-settings.jsx';
 export * from './help-centre.jsx';
 export * from './responsible-trading.jsx';
