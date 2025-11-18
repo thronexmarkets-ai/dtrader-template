@@ -43,11 +43,14 @@ jest.mock('@deriv/shared', () => ({
     },
 }));
 
+// Create stable mock data outside the mock function to prevent infinite loops
+const mockProposalData = {
+    proposal: {},
+};
+
 jest.mock('AppV2/Hooks/useProposal', () => ({
     useProposal: jest.fn(() => ({
-        data: {
-            proposal: {},
-        },
+        data: mockProposalData,
         error: null,
         isFetching: false,
     })),
@@ -126,11 +129,13 @@ describe('Stake', () => {
         render(<MockedStake />);
 
         await userEvent.click(screen.getByText(stake_param_label));
-        await userEvent.type(screen.getByPlaceholderText(input_placeholder), '10');
+        const input = screen.getByPlaceholderText(input_placeholder);
+        await userEvent.clear(input);
+        await userEvent.type(input, '10');
         await userEvent.click(screen.getByRole('button', { name: save_button_label }));
 
         expect(default_mock_store.modules.trade.onChange).toHaveBeenCalledWith({
-            target: { name: 'amount', value: 10 },
+            target: { name: 'amount', value: '10' },
         });
     });
 

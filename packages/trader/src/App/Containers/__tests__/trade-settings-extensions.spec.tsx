@@ -14,7 +14,11 @@ describe('<TradeSettingsExtensions/>', () => {
         ...mockStore({}),
         ui: {
             ...mockStore({}).ui,
-            populateSettingsExtensions: jest.fn(menu_items => menu_items[0].value(mockStore({}))),
+            populateSettingsExtensions: jest.fn(menu_items => {
+                if (menu_items && menu_items.length > 0) {
+                    menu_items[0].value(mockStore({}));
+                }
+            }),
         },
     };
 

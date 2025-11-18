@@ -21,7 +21,7 @@
 
 - [x] **Update webpack config for core package**
     - [x] Open `packages/core/build/webpack.config.js`
-    - [x] Add `charts` cache group for @deriv-com/derivatives-charts (priority: 20)
+    - [x] Add `charts` cache group for @deriv-com/smartcharts-champion (priority: 20)
     - [x] Keep existing `defaultVendors` cache group intact
     - [x] Did NOT split framework/icons/ui (breaks externals pattern)
     - [x] Save file: `packages/core/build/webpack.config.js:58-64`
@@ -245,7 +245,7 @@
         ```javascript
         const init = () => {
             module = moduleLoader(() => {
-                return import(/* webpackChunkName: "smart_chart" */ '@deriv-com/derivatives-charts');
+                return import(/* webpackChunkName: "smart_chart" */ '@deriv-com/smartcharts-champion');
             });
         };
 

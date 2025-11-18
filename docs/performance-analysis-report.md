@@ -82,7 +82,7 @@ optimization: {
         priority: 25,
       },
       charts: {
-        test: /[\\/]node_modules[\\/](@deriv-com\/derivatives-charts)[\\/]/,
+        test: /[\\/]node_modules[\\/](@deriv-com\/smartcharts-champion)[\\/]/,
         name: 'charts',
         priority: 20,
       },
@@ -157,7 +157,7 @@ const MobileNav = isMobile
 // packages/trader/src/Modules/SmartChart/index.tsx
 // Lazy load chart only when user navigates to trading screen
 const SmartChart = React.lazy(() =>
-  import(/* webpackChunkName: "smart-chart", webpackPrefetch: true */ '@deriv-com/derivatives-charts')
+  import(/* webpackChunkName: "smart-chart", webpackPrefetch: true */ '@deriv-com/smartcharts-champion')
 );
 
 // Add loading state
@@ -169,11 +169,11 @@ const SmartChart = React.lazy(() =>
 ```javascript
 // webpack.config.js - Externalize or CDN for stable chart versions
 externals: {
-  '@deriv-com/derivatives-charts': {
+  '@deriv-com/smartcharts-champion': {
     root: 'DerivCharts',
-    commonjs2: '@deriv-com/derivatives-charts',
-    commonjs: '@deriv-com/derivatives-charts',
-    amd: '@deriv-com/derivatives-charts',
+    commonjs2: '@deriv-com/smartcharts-champion',
+    commonjs: '@deriv-com/smartcharts-champion',
+    amd: '@deriv-com/smartcharts-champion',
   },
 }
 ```

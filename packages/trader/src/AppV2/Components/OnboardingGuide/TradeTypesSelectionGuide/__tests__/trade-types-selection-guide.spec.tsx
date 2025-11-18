@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import TradeTypesSelectionGuide from '../trade-types-selection-guide';
@@ -20,10 +20,14 @@ describe('TradeTypesSelectionGuide', () => {
         jest.useFakeTimers();
         render(<TradeTypesSelectionGuide />);
 
-        await waitFor(() => jest.advanceTimersByTime(800));
+        act(() => {
+            jest.advanceTimersByTime(800);
+        });
 
-        expect(screen.getByText(video)).toBeInTheDocument();
-        expect(screen.getByText(modal_text)).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText(video)).toBeInTheDocument();
+            expect(screen.getByText(modal_text)).toBeInTheDocument();
+        });
 
         jest.useRealTimers();
     });
@@ -48,17 +52,24 @@ describe('TradeTypesSelectionGuide', () => {
         jest.useFakeTimers();
         render(<TradeTypesSelectionGuide />);
 
-        await waitFor(() => jest.advanceTimersByTime(800));
+        act(() => {
+            jest.advanceTimersByTime(800);
+        });
 
-        expect(screen.getByText(video)).toBeInTheDocument();
-        expect(screen.getByText(modal_text)).toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.getByText(video)).toBeInTheDocument();
+            expect(screen.getByText(modal_text)).toBeInTheDocument();
+        });
+
         expect(JSON.parse(localStorage.getItem(localStorage_key) as string)[field]).toBe(false);
 
         await userEvent.click(screen.getByRole('button'));
-        await waitFor(() => jest.advanceTimersByTime(300));
 
-        expect(screen.queryByText(video)).not.toBeInTheDocument();
-        expect(screen.queryByText(modal_text)).not.toBeInTheDocument();
+        await waitFor(() => {
+            expect(screen.queryByText(video)).not.toBeInTheDocument();
+            expect(screen.queryByText(modal_text)).not.toBeInTheDocument();
+        });
+
         expect(JSON.parse(localStorage.getItem(localStorage_key) as string)[field]).toBe(true);
 
         jest.useRealTimers();

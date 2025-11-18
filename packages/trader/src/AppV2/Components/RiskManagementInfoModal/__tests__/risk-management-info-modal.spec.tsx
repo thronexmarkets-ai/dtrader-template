@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import RiskManagementInfoModal from '../risk-management-info-modal';
@@ -47,9 +47,15 @@ describe('RiskManagementInfoModal', () => {
         expect(screen.getByText(infoMessage)).toBeInTheDocument();
 
         await userEvent.click(button);
-        await waitFor(() => jest.advanceTimersByTime(300));
 
-        expect(screen.queryByText(headerContent)).not.toBeInTheDocument();
+        act(() => {
+            jest.advanceTimersByTime(300);
+        });
+
+        await waitFor(() => {
+            expect(screen.queryByText(headerContent)).not.toBeInTheDocument();
+        });
+
         jest.useRealTimers();
     });
 

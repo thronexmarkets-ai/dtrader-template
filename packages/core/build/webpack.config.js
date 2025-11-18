@@ -57,7 +57,7 @@ module.exports = function (env) {
                 cacheGroups: {
                     // Split out large, stable chart library for better caching
                     charts: {
-                        test: /[\\/]node_modules[\\/]@deriv-com[\\/]derivatives-charts[\\/]/,
+                        test: /[\\/]node_modules[\\/]@deriv-com[\\/]smartcharts-champion[\\/]/,
                         name: 'charts',
                         priority: 20,
                         reuseExistingChunk: true,

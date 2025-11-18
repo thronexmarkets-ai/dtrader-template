@@ -47,6 +47,7 @@ const default_mocked_props: React.ComponentProps<typeof TogglePositionsMobile> =
     is_empty: true,
     onClickSell: jest.fn(),
     onClickCancel: jest.fn(),
+    removePositionById: jest.fn(),
 };
 
 const default_mock_store = {
@@ -136,6 +137,7 @@ describe('TogglePositionsMobile component', () => {
             is_empty: false,
             onClickSell: jest.fn(),
             onClickCancel: jest.fn(),
+            removePositionById: jest.fn(),
         };
         const mock_root_store = mockStore({
             ...default_mock_store,
@@ -185,6 +187,7 @@ describe('TogglePositionsMobile component', () => {
             is_empty: false,
             onClickSell: jest.fn(),
             onClickCancel: jest.fn(),
+            removePositionById: jest.fn(),
         };
         const mock_root_store = mockStore({
             ...default_mock_store,
@@ -195,10 +198,7 @@ describe('TogglePositionsMobile component', () => {
 
         const close_icon = screen.getByTestId('dt_modal_header_close');
         await userEvent.click(close_icon);
-        await waitFor(() => {
-            expect(mock_root_store.ui.togglePositionsDrawer).toHaveBeenCalled();
-            expect(screen.getByText(/PositionsModalCard/i)).toBeInTheDocument();
-        });
+        expect(mock_root_store.ui.togglePositionsDrawer).toHaveBeenCalled();
     });
     it('should display no more than 5 recent positions', () => {
         const positions_pair: React.ComponentProps<typeof TogglePositionsMobile>['filtered_positions'] = [

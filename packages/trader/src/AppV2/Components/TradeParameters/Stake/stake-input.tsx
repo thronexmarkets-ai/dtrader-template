@@ -6,8 +6,8 @@ import {
     formatMoney,
     getCurrencyDisplayCode,
     getDecimalPlaces,
-    trackAnalyticsEvent,
     mapErrorMessage,
+    trackAnalyticsEvent,
 } from '@deriv/shared';
 import { ActionSheet, TextFieldWithSteppers } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
