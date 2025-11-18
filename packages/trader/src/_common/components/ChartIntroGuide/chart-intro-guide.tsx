@@ -251,11 +251,11 @@ const ChartIntroGuide = ({ is_mobile = false, is_logged_in = false }: TChartIntr
 
             <div className='chart-intro-guide__content'>
                 <Text as='h4' weight='bold' className='chart-intro-guide__title'>
-                    {localize(current_step_data.title)}
+                    {current_step_data.title}
                 </Text>
 
                 <Text size='md' className='chart-intro-guide__description'>
-                    {localize(current_step_data.description)}
+                    {current_step_data.description}
                 </Text>
 
                 <ChartIntroVideo video_id={current_step_data.video_id} is_mobile={is_mobile} />
