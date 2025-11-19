@@ -12,7 +12,7 @@ import TraderProviders from '../trader-providers';
 
 import ServicesErrorSnackbar from './Components/ServicesErrorSnackbar';
 import Notifications from './Containers/Notifications';
-import Layouts from './Layouts';
+import AppShell from './app-shell';
 
 import 'Sass/app.scss';
 
@@ -51,7 +51,7 @@ const App = ({ passthrough }: Apptypes) => {
                     <NotificationsProvider>
                         <SnackbarProvider>
                             <Notifications />
-                            <Layouts />
+                            <AppShell />
                             <ServicesErrorSnackbar />
                         </SnackbarProvider>
                     </NotificationsProvider>

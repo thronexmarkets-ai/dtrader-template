@@ -12,9 +12,10 @@ import { useDevice } from '@deriv-com/ui';
 import { routes } from '@deriv/shared';
 import { Localize } from '@deriv-com/translations';
 import BottomNav from 'AppV2/Components/BottomNav';
-import Router from '../Routes/router';
+import Router from './Routes/router';
+import Sidebar from 'App/Components/Layout/Sidebar/sidebar';
 
-const Layouts = observer(() => {
+const AppShell = observer(() => {
     const { portfolio, client } = useStore();
     const { is_logged_in } = client;
     const { active_positions_count } = portfolio;
@@ -73,11 +74,12 @@ const Layouts = observer(() => {
     const should_show_bottomnav = isMobile && is_logged_in && !window.location.pathname.startsWith('/contract');
 
     return (
-        <div>
+        <React.Fragment>
+            {!isMobile && <Sidebar />}
             <Router />
             {should_show_bottomnav && <BottomNav bottomNavItems={bottomNavItems} />}
-        </div>
+        </React.Fragment>
     );
 });
 
-export default Layouts;
+export default AppShell;
