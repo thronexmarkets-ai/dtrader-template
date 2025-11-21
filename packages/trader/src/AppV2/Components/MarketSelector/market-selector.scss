@@ -4,13 +4,19 @@
     gap: var(--core-spacing-400);
 
     &__container {
-        padding: 0 var(--core-spacing-800);
+        position: absolute;
+        z-index: 99;
+        padding: var(--core-spacing-800);
+        background: var(--core-color-solid-slate-50);
+        top: 8rem;
+        left: 8.8rem;
 
-        @include desktop-screen {
-            position: absolute;
-            z-index: 99;
-            padding: var(--core-spacing-800);
-            background: var(--core-color-solid-slate-50);
+        @include mobile-screen {
+            position: relative;
+            background: unset;
+            padding: 0 var(--core-spacing-800);
+            top: unset;
+            left: unset;
         }
     }
     &__skeleton {

@@ -11,5 +11,6 @@
 
     @include mobile-screen {
         flex-direction: column;
+        height: 100%;
     }
 }

@@ -7,7 +7,6 @@ import { getSymbolDisplayName, trackAnalyticsEvent } from '@deriv/shared';
 import { useLocalStorageData } from '@deriv/api';
 import { useTraderStore } from 'Stores/useTraderStores';
 import PurchaseButton from 'AppV2/Components/PurchaseButton';
-import { getChartHeight } from 'AppV2/Utils/layout-utils';
 import { TradeParametersContainer, TradeParameters } from 'AppV2/Components/TradeParameters';
 import CurrentSpot from 'AppV2/Components/CurrentSpot';
 import { TradeChart } from '../Chart';
@@ -32,7 +31,6 @@ const TradeDesktop = observer(() => {
     const {
         active_symbols,
         contract_type,
-        has_cancellation,
         is_accumulator,
         is_multiplier,
         is_market_closed,
@@ -105,13 +103,13 @@ const TradeDesktop = observer(() => {
 
     return (
         <div
-            className={clsx('trade', {
-                trade__logout: !is_logged_in,
+            className={clsx('trade-container-v2', {
+                'trade-container-v2__logout': !is_logged_in,
             })}
         >
             {symbols.length && trade_types.length ? (
                 <React.Fragment>
-                    <div className='trade-container__header'>
+                    <div className='trade-container-v2__header'>
                         <TradeTypes
                             contract_type={contract_type}
                             onTradeTypeSelect={onTradeTypeSelect}
@@ -120,12 +118,13 @@ const TradeDesktop = observer(() => {
                         />
                         <AccountHeader />
                     </div>
-                    <div className='trade-container__grid'>
-                        <div className='trade-container__chart-tooltip'>
+                    <MarketSelector />
+                    <div className='trade-container-v2__grid'>
+                        <div className='trade-container-v2__chart-tooltip'>
                             {isDigitTradeType(contract_type) && <CurrentSpot />}
                             <section
-                                className={clsx('trade-container__chart', {
-                                    'trade-container__chart--with-borderRadius': !is_accumulator,
+                                className={clsx('trade-container-v2__chart', {
+                                    'trade-container-v2__chart--with-borderRadius': !is_accumulator,
                                 })}
                                 style={{
                                     height: '100%',

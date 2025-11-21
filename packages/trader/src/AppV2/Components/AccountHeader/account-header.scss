@@ -2,6 +2,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    width: 32rem;
+    padding: 0 var(--core-spacing-400) 0 var(--core-spacing-800);
 
     &__info {
         display: flex;

@@ -1,15 +1,17 @@
 .trade-params {
-    border-radius: var(--core-borderRadius-400);
     background-color: var(--semantic-color-slate-solid-surface-frame-low);
-    padding: var(--core-spacing-800);
     display: flex;
     flex-direction: column;
-    justify-content: center;
     gap: var(--core-spacing-800);
+    padding: var(--core-spacing-800);
 
-    @include desktop-screen {
-        justify-content: unset;
-        margin-inline-start: unset;
+    @include mobile-screen {
+        justify-content: center;
+        padding: var(--core-spacing-800);
+    }
+
+    @include mobile-screen {
+        border-radius: var(--core-borderRadius-400);
     }
 
     &__title {
