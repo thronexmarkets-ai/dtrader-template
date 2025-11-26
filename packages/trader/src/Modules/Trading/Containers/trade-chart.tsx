@@ -43,7 +43,7 @@ const TradeChart = observer((props: TTradeChartProps) => {
     } = contract_trade;
     const ref = React.useRef<{ hasPredictionIndicators(): void; triggerPopup(arg: () => void): void }>(null);
     const { all_positions } = portfolio;
-    const { is_chart_countdown_visible, is_chart_layout_default, is_dark_mode_on, is_positions_drawer_on } = ui;
+    const { is_chart_countdown_visible, is_chart_layout_default, is_dark_mode_on, active_sidebar_flyout } = ui;
     const { current_language, is_socket_opened } = common;
     const {
         active_symbols,
@@ -190,7 +190,7 @@ const TradeChart = observer((props: TTradeChartProps) => {
                 }}
                 isLive
                 leftMargin={
-                    !isMobile && is_positions_drawer_on
+                    !isMobile && active_sidebar_flyout
                         ? CHART_CONSTANTS.LEFT_MARGIN_WITH_DRAWER
                         : CHART_CONSTANTS.LEFT_MARGIN_DEFAULT
                 }

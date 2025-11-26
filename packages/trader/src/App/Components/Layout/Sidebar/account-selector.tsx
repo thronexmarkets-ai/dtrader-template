@@ -1,0 +1,31 @@
+import { Button, Text } from '@deriv/components';
+import { LegacyLogout1pxIcon } from '@deriv/quill-icons';
+import { observer, useStore } from '@deriv/stores';
+import { localize } from '@deriv-com/translations';
+
+const AccountSelector = observer(() => {
+    const { client, ui } = useStore();
+    const { logout, is_logged_in } = client;
+    const { closeSidebarFlyout } = ui;
+
+    const handleLogout = () => {
+        closeSidebarFlyout();
+        logout();
+    };
+
+    return (
+        <div className='flyout-selector'>
+            {is_logged_in && (
+                <Button
+                    className='flyout-selector__option'
+                    onClick={handleLogout}
+                    icon={<LegacyLogout1pxIcon iconSize='xs' fill='var(--color-text-primary)' />}
+                >
+                    <Text>{localize('Log out')}</Text>
+                </Button>
+            )}
+        </div>
+    );
+});
+
+export default AccountSelector;

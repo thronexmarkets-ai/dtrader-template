@@ -67,7 +67,7 @@ const TradeChart = observer(() => {
     } = contract_trade;
     const ref = React.useRef<{ hasPredictionIndicators(): void; triggerPopup(arg: () => void): void }>(null);
     const { all_positions, removePositionById: onClickRemove } = portfolio;
-    const { is_chart_countdown_visible, is_chart_layout_default, is_dark_mode_on, is_positions_drawer_on } = ui;
+    const { is_chart_countdown_visible, is_chart_layout_default, is_dark_mode_on, active_sidebar_flyout } = ui;
     const { current_language, is_socket_opened } = common;
     const { activeSymbols: active_symbols } = useActiveSymbols();
     const { symbol } = useDefaultSymbol();
@@ -246,7 +246,7 @@ const TradeChart = observer(() => {
                 }}
                 isLive
                 leftMargin={
-                    !isMobile && is_positions_drawer_on
+                    !isMobile && active_sidebar_flyout
                         ? CHART_CONSTANTS.LEFT_MARGIN_WITH_DRAWER
                         : CHART_CONSTANTS.LEFT_MARGIN_DEFAULT
                 }
@@ -265,6 +265,5 @@ const TradeChart = observer(() => {
             </SmartChart>
         </>
     );
-    // [/AI]
 });
 export default TradeChart;

@@ -36,6 +36,15 @@ const App = ({ root_store }) => {
             import('@deriv-com/smartcharts-champion/dist/smartcharts.css');
         };
 
+        // Check for theme query parameter and set theme accordingly
+        const urlParams = new URLSearchParams(window.location.search);
+        const themeParam = urlParams.get('theme');
+        if (themeParam === 'dark') {
+            root_store.ui.setDarkMode(true);
+        } else if (themeParam === 'light') {
+            root_store.ui.setDarkMode(false);
+        }
+
         // TODO: [translation-to-shared]: add translation implemnentation in shared
         setUrlLanguage(language);
         initFormErrorMessages(FORM_ERROR_MESSAGES);

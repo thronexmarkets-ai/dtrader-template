@@ -177,12 +177,17 @@ const ToggleMenuDrawer = observer(() => {
 
     return (
         <React.Fragment>
-            <a 
-                id='dt_mobile_drawer_toggle' 
-                onClick={isBridgeAvailable() ? async (e) => {
-                    e.preventDefault();
-                    await handleBackClick();
-                } : toggleDrawer} 
+            <a
+                id='dt_mobile_drawer_toggle'
+                data-testid='dt_mobile_drawer_toggle'
+                onClick={
+                    isBridgeAvailable()
+                        ? async e => {
+                              e.preventDefault();
+                              await handleBackClick();
+                          }
+                        : toggleDrawer
+                }
                 className='header__mobile-drawer-toggle'
             >
                 {isBridgeAvailable() ? (
@@ -261,13 +266,15 @@ const ToggleMenuDrawer = observer(() => {
                                     </MobileDrawer.Item>
                                 )}
                                 {is_logged_in && (
-                                    <MobileDrawer.Item onClick={async (e) => {
-                                        e.preventDefault();
-                                        await handleLogout();
-                                    }}>
-                                        <MenuLink 
-                                            icon={<LegacyLogout1pxIcon />} 
-                                            text={isBridgeAvailable() ? localize('Back to app') : localize('Log out')} 
+                                    <MobileDrawer.Item
+                                        onClick={async e => {
+                                            e.preventDefault();
+                                            await handleLogout();
+                                        }}
+                                    >
+                                        <MenuLink
+                                            icon={<LegacyLogout1pxIcon />}
+                                            text={isBridgeAvailable() ? localize('Back to app') : localize('Log out')}
                                         />
                                     </MobileDrawer.Item>
                                 )}

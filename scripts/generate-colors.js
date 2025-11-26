@@ -270,7 +270,7 @@ function generateSemanticTokens() {
     // Interactive States
     --color-interactive-default: #{lighten($color-black, 20%)};         // Default borders, dividers
     --color-interactive-hover: #{lighten($color-black, 8%)};            // Hover states (derived from brand-black to get #242828)
-    --color-interactive-active: #{lighten($color-black, 25%)};          // Active/selected states (derived from brand-black to get #323738)
+    --color-interactive-active: #{lighten($color-black, 16%)};          // Active/selected states (derived from brand-black to get #323738)
     --color-interactive-disabled: #{lighten($color-black, 12%)};        // Disabled states
     --color-interactive-focus: var(--brand-info);                       // Focus states
 
@@ -357,8 +357,8 @@ function generateComponentTokens() {
 
     // Navigation Colors
     --color-nav-bg: var(--color-surface-primary);
-    --color-nav-border: var(--color-interactive-default);
-    --color-nav-item-active: var(--brand-primary);
+    --color-nav-border: var(--color-surface-border);
+    --color-nav-item-active: var(--brand-danger);
     --color-nav-item-hover: var(--color-interactive-hover);
 
     // Modal/Dialog Colors
@@ -450,9 +450,9 @@ function generateComponentTokens() {
     --color-card-shadow: var(--color-shadow-subtle);
 
     // Navigation Colors
-    --color-nav-bg: #{lighten($color-black, 8%)};
-    --color-nav-border: var(--color-interactive-default);
-    --color-nav-item-active: var(--brand-primary);
+    --color-nav-bg: var(--color-surface-primary);
+    --color-nav-border: var(--color-surface-border);
+    --color-nav-item-active: var(--brand-danger);
     --color-nav-item-hover: var(--color-interactive-hover);
 
     // Modal/Dialog Colors

@@ -9,12 +9,16 @@ jest.mock('@deriv/shared', () => ({
     getBrandHomeUrl: jest.fn(() => 'https://home.deriv.com/dashboard/home'),
 }));
 
+const mockSendBridgeEvent = jest.fn();
+const mockIsBridgeAvailable = jest.fn(() => false);
+const mockUseMobileBridge = jest.fn(() => ({
+    sendBridgeEvent: mockSendBridgeEvent,
+    isBridgeAvailable: mockIsBridgeAvailable,
+    isDesktop: true,
+}));
+
 jest.mock('App/Hooks/useMobileBridge', () => ({
-    useMobileBridge: jest.fn(() => ({
-        sendBridgeEvent: jest.fn(),
-        isBridgeAvailable: jest.fn(() => false),
-        isDesktop: true,
-    })),
+    useMobileBridge: () => mockUseMobileBridge(),
 }));
 
 // Mock window.location.href
@@ -45,7 +49,16 @@ describe('BrandShortLogo', () => {
         mockLocation.href = '';
         // Reset getBrandHomeUrl mock to default value
         (getBrandHomeUrl as jest.Mock).mockReturnValue('https://home.deriv.com/dashboard/home');
+        // Reset useMobileBridge mock to default values
+        mockSendBridgeEvent.mockClear();
+        mockIsBridgeAvailable.mockReturnValue(false);
+        mockUseMobileBridge.mockReturnValue({
+            sendBridgeEvent: mockSendBridgeEvent,
+            isBridgeAvailable: mockIsBridgeAvailable,
+            isDesktop: true,
+        });
         // Clear DerivAppChannel from window
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         delete (window as any).DerivAppChannel;
     });
 
@@ -61,13 +74,13 @@ describe('BrandShortLogo', () => {
 
     it('should redirect to brand URL with language parameter when logo is clicked', async () => {
         // Mock desktop behavior - should execute fallback
-        const { useMobileBridge } = require('App/Hooks/useMobileBridge');
-        const mockSendBridgeEvent = jest.fn((event, fallback) => {
+        mockSendBridgeEvent.mockImplementation((_event, fallback) => {
             fallback(); // Execute fallback for desktop
         });
-        useMobileBridge.mockReturnValue({
+        mockIsBridgeAvailable.mockReturnValue(false);
+        mockUseMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: jest.fn(() => false),
+            isBridgeAvailable: mockIsBridgeAvailable,
             isDesktop: true,
         });
 
@@ -86,13 +99,13 @@ describe('BrandShortLogo', () => {
         (getBrandHomeUrl as jest.Mock).mockReturnValue('https://staging-home.deriv.com/dashboard/home');
 
         // Mock desktop behavior - should execute fallback
-        const { useMobileBridge } = require('App/Hooks/useMobileBridge');
-        const mockSendBridgeEvent = jest.fn((event, fallback) => {
+        mockSendBridgeEvent.mockImplementation((_event, fallback) => {
             fallback(); // Execute fallback for desktop
         });
-        useMobileBridge.mockReturnValue({
+        mockIsBridgeAvailable.mockReturnValue(false);
+        mockUseMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: jest.fn(() => false),
+            isBridgeAvailable: mockIsBridgeAvailable,
             isDesktop: true,
         });
 
@@ -108,33 +121,32 @@ describe('BrandShortLogo', () => {
 
     it('should not render when bridge is available (Flutter mobile app)', () => {
         // Mock mobile bridge available
-        const { useMobileBridge } = require('App/Hooks/useMobileBridge');
-        const mockSendBridgeEvent = jest.fn();
-        useMobileBridge.mockReturnValue({
+        mockIsBridgeAvailable.mockReturnValue(true);
+        mockUseMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: jest.fn(() => true),
+            isBridgeAvailable: mockIsBridgeAvailable,
             isDesktop: false,
         });
 
         const { container } = renderComponent();
 
         // Logo should not be rendered when bridge is available
-        expect(container.firstChild).toBeNull();
+        expect(container).toBeEmptyDOMElement();
         expect(screen.queryByTestId('brand-logo-clickable')).not.toBeInTheDocument();
     });
 
     it('should fallback to brand URL when bridge is not available', async () => {
         // Reset the mock to return the default URL
         (getBrandHomeUrl as jest.Mock).mockReturnValue('https://home.deriv.com/dashboard/home');
-        
+
         // Mock bridge not available
-        const { useMobileBridge } = require('App/Hooks/useMobileBridge');
-        const mockSendBridgeEvent = jest.fn((event, fallback) => {
+        mockSendBridgeEvent.mockImplementation((_event, fallback) => {
             fallback(); // Execute fallback
         });
-        useMobileBridge.mockReturnValue({
+        mockIsBridgeAvailable.mockReturnValue(false);
+        mockUseMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: jest.fn(() => false),
+            isBridgeAvailable: mockIsBridgeAvailable,
             isDesktop: false,
         });
 
@@ -151,13 +163,13 @@ describe('BrandShortLogo', () => {
 
     it('should handle bridge errors gracefully', async () => {
         // Mock bridge error
-        const { useMobileBridge } = require('App/Hooks/useMobileBridge');
-        const mockSendBridgeEvent = jest.fn((event, fallback) => {
+        mockSendBridgeEvent.mockImplementation((_event, fallback) => {
             fallback(); // Execute fallback on error
         });
-        useMobileBridge.mockReturnValue({
+        mockIsBridgeAvailable.mockReturnValue(false); // Set to false so logo renders
+        mockUseMobileBridge.mockReturnValue({
             sendBridgeEvent: mockSendBridgeEvent,
-            isBridgeAvailable: jest.fn(() => false), // Set to false so logo renders
+            isBridgeAvailable: mockIsBridgeAvailable,
             isDesktop: false,
         });
 
@@ -174,27 +186,27 @@ describe('BrandShortLogo', () => {
 
     it('should hide logo when bridge is available (Flutter mobile app)', () => {
         // Mock bridge available
-        const { useMobileBridge } = require('App/Hooks/useMobileBridge');
-        useMobileBridge.mockReturnValue({
-            sendBridgeEvent: jest.fn(),
-            isBridgeAvailable: jest.fn(() => true),
+        mockIsBridgeAvailable.mockReturnValue(true);
+        mockUseMobileBridge.mockReturnValue({
+            sendBridgeEvent: mockSendBridgeEvent,
+            isBridgeAvailable: mockIsBridgeAvailable,
             isDesktop: false,
         });
 
         const { container } = renderComponent();
 
         // Logo should not be rendered when bridge is available
-        expect(container.firstChild).toBeNull();
+        expect(container).toBeEmptyDOMElement();
         expect(screen.queryByTestId('brand-logo-clickable')).not.toBeInTheDocument();
         expect(screen.queryByRole('img')).not.toBeInTheDocument();
     });
 
     it('should show logo when bridge is not available (regular web)', () => {
         // Mock bridge not available
-        const { useMobileBridge } = require('App/Hooks/useMobileBridge');
-        useMobileBridge.mockReturnValue({
-            sendBridgeEvent: jest.fn(),
-            isBridgeAvailable: jest.fn(() => false),
+        mockIsBridgeAvailable.mockReturnValue(false);
+        mockUseMobileBridge.mockReturnValue({
+            sendBridgeEvent: mockSendBridgeEvent,
+            isBridgeAvailable: mockIsBridgeAvailable,
             isDesktop: false,
         });
 
@@ -207,10 +219,10 @@ describe('BrandShortLogo', () => {
 
     it('should show logo on desktop regardless of bridge availability', () => {
         // Mock desktop - bridge should not be available on desktop
-        const { useMobileBridge } = require('App/Hooks/useMobileBridge');
-        useMobileBridge.mockReturnValue({
-            sendBridgeEvent: jest.fn(),
-            isBridgeAvailable: jest.fn(() => false), // Bridge not available on desktop
+        mockIsBridgeAvailable.mockReturnValue(false); // Bridge not available on desktop
+        mockUseMobileBridge.mockReturnValue({
+            sendBridgeEvent: mockSendBridgeEvent,
+            isBridgeAvailable: mockIsBridgeAvailable,
             isDesktop: true,
         });
 

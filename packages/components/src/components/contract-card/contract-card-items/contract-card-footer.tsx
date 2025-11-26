@@ -121,7 +121,6 @@ const CardFooter = ({
             {footer_content}
         </CSSTransition>
     );
-    // [/AI]
 };
 
 export default CardFooter;
