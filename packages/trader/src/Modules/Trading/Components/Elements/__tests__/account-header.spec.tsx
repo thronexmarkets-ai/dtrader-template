@@ -110,6 +110,165 @@ describe('AccountHeader', () => {
             expect(manageButton).toHaveAttribute('type', 'button');
             expect(manageButton).toHaveClass('account-header__transfer');
         });
+        describe('Invalid balance handling', () => {
+            it('should display dash with currency when balance is NaN', () => {
+                const nan_balance_store = mockStore({
+                    client: {
+                        balance: 'NaN',
+                        currency: 'USD',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(nan_balance_store);
+
+                expect(screen.getByText('- USD')).toBeInTheDocument();
+                expect(screen.queryByText('NaN USD')).not.toBeInTheDocument();
+            });
+
+            it('should display dash with currency when balance is null', () => {
+                const null_balance_store = mockStore({
+                    client: {
+                        balance: null as any,
+                        currency: 'EUR',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(null_balance_store);
+
+                expect(screen.getByText('- EUR')).toBeInTheDocument();
+            });
+
+            it('should display dash with currency when balance is undefined', () => {
+                const undefined_balance_store = mockStore({
+                    client: {
+                        balance: undefined,
+                        currency: 'GBP',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(undefined_balance_store);
+
+                expect(screen.getByText('- GBP')).toBeInTheDocument();
+            });
+
+            it('should display dash with currency when balance is empty string', () => {
+                const empty_balance_store = mockStore({
+                    client: {
+                        balance: '',
+                        currency: 'AUD',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(empty_balance_store);
+
+                expect(screen.getByText('- AUD')).toBeInTheDocument();
+            });
+
+            it('should display dash with currency when balance is invalid string', () => {
+                const invalid_balance_store = mockStore({
+                    client: {
+                        balance: 'invalid',
+                        currency: 'CAD',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(invalid_balance_store);
+
+                expect(screen.getByText('- CAD')).toBeInTheDocument();
+                expect(screen.queryByText('invalid CAD')).not.toBeInTheDocument();
+            });
+
+            it('should display balance correctly when balance is a number type', () => {
+                renderComponent(default_mock_store, {
+                    balance: 1000.5,
+                    currency: 'USD',
+                    is_logged_in: true,
+                    is_virtual: false,
+                });
+
+                expect(screen.getByText('1,000.50 USD')).toBeInTheDocument();
+            });
+
+            it('should display balance correctly when balance is comma-formatted string', () => {
+                const comma_balance_store = mockStore({
+                    client: {
+                        balance: '10,000.00',
+                        currency: 'USD',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(comma_balance_store);
+
+                expect(screen.getByText('10,000.00 USD')).toBeInTheDocument();
+            });
+
+            it('should not render balance section when currency is missing and balance is invalid', () => {
+                const no_currency_invalid_balance_store = mockStore({
+                    client: {
+                        balance: 'NaN',
+                        currency: '',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(no_currency_invalid_balance_store);
+
+                expect(screen.getByText('No currency assigned')).toBeInTheDocument();
+                expect(screen.queryByText('- ')).not.toBeInTheDocument();
+            });
+
+            it('should handle zero balance correctly', () => {
+                const zero_balance_store = mockStore({
+                    client: {
+                        balance: '0.00',
+                        currency: 'USD',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(zero_balance_store);
+
+                expect(screen.getByText('0.00 USD')).toBeInTheDocument();
+            });
+
+            it('should handle negative balance correctly', () => {
+                const negative_balance_store = mockStore({
+                    client: {
+                        balance: '-500.00',
+                        currency: 'USD',
+                        is_logged_in: true,
+                        is_virtual: false,
+                        logout: jest.fn(),
+                    },
+                });
+
+                renderComponent(negative_balance_store);
+
+                expect(screen.getByText('-500.00 USD')).toBeInTheDocument();
+            });
+        });
     });
 
     describe('Logged out state', () => {

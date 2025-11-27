@@ -29,6 +29,13 @@ const AccountHeader = observer(
         const is_logged_in = isLoggedInProp ?? client.is_logged_in;
         const is_virtual = isVirtualProp ?? client.is_virtual;
 
+        // Check if balance is a valid number (handles comma-formatted strings like "10,000.00")
+        const isValidBalance =
+            balance !== undefined &&
+            balance !== null &&
+            balance !== '' &&
+            !isNaN(Number(String(balance).replace(/,/g, '')));
+
         const currency_lower = currency?.toLowerCase();
         const accountTypeHeader = is_virtual ? localize('Demo') : localize('Real');
         const isDemoAccount = is_virtual;
@@ -64,15 +71,15 @@ const AccountHeader = observer(
                             <Text as='p' size='xxs' className='account-header__type'>
                                 {accountTypeHeader}
                             </Text>
-                            {(typeof balance !== 'undefined' || !currency) && (
-                                <p className='account-header__balance'>
-                                    {!currency ? (
-                                        <Localize i18n_default_text='No currency assigned' />
-                                    ) : (
-                                        `${addComma(balance, 2)} ${getCurrencyDisplayCode(currency)}`
-                                    )}
-                                </p>
-                            )}
+                            <p className='account-header__balance'>
+                                {!currency ? (
+                                    <Localize i18n_default_text='No currency assigned' />
+                                ) : isValidBalance ? (
+                                    `${addComma(balance, 2)} ${getCurrencyDisplayCode(currency)}`
+                                ) : (
+                                    `- ${getCurrencyDisplayCode(currency)}`
+                                )}
+                            </p>
                         </div>
                     </div>
                 )}
