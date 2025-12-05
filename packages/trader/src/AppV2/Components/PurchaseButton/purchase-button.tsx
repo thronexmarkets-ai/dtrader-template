@@ -156,13 +156,14 @@ const PurchaseButton = observer(() => {
     }, [is_purchase_enabled]);
 
     React.useEffect(() => {
+        const is_rise_fall = /^rise_fall/.test(contract_type.toLowerCase());
         const shouldSwitchToStake =
-            basis === BASIS_PAYOUT && basis_options.length > 1 && basis_options.includes(BASIS_STAKE);
+            basis === BASIS_PAYOUT && basis_options.length > 1 && basis_options.includes(BASIS_STAKE) && !is_rise_fall;
         if (shouldSwitchToStake) {
             onChange({ target: { value: BASIS_STAKE, name: BASIS_NAME } });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [basis, basis_options]);
+    }, [basis, basis_options, contract_type]);
 
     React.useEffect(() => {
         const is_animated =
