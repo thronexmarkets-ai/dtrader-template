@@ -88,12 +88,16 @@ export const AVAILABLE_CONTRACTS = [
     },
 ];
 
-export const getTradeTypesList = (contract_types_list: ReturnType<typeof useTraderStore>['contract_types_list']) => {
+export const getTradeTypesList = (
+    contract_types_list: ReturnType<typeof useTraderStore>['contract_types_list'],
+    nativeAppAllowedTradeTypes?: string[]
+) => {
     const available_trade_types = getAvailableContractTypes(
         contract_types_list as unknown as Parameters<typeof getAvailableContractTypes>[0],
         unsupported_contract_types_list
     );
-    return Object.values(getCategoriesSortedByKey(available_trade_types))
+
+    let filtered_types = Object.values(getCategoriesSortedByKey(available_trade_types))
         .map(({ contract_types }) =>
             contract_types[0].value.startsWith('vanilla')
                 ? contract_types.map(type => ({ ...type, text: 'Vanillas' }))
@@ -104,6 +108,13 @@ export const getTradeTypesList = (contract_types_list: ReturnType<typeof useTrad
             ({ value }) =>
                 ![TRADE_TYPES.VANILLA.PUT, TRADE_TYPES.TURBOS.SHORT, TRADE_TYPES.RISE_FALL_EQUAL].includes(value)
         );
+
+    // Filter for native mobile app - only show allowed trade types from remote config
+    if (nativeAppAllowedTradeTypes) {
+        filtered_types = filtered_types.filter(({ text }) => text && nativeAppAllowedTradeTypes.includes(text));
+    }
+
+    return filtered_types;
 };
 
 /* Gets the array of sorted contract types that are used to display purchased buttons and other info based on a selected trade type tab if applicable. */

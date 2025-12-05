@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { useQuery } from '@deriv/api';
+import { useQuery, useRemoteConfig } from '@deriv/api';
 import { cloneObject, getContractCategoriesConfig, getContractTypesConfig, setTradeURLParams } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 
+import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import { checkContractTypePrefix } from 'AppV2/Utils/contract-type';
 import { getTradeTypesList } from 'AppV2/Utils/trade-types-utils';
 import { TContractType } from 'Modules/Trading/Components/Form/ContractType/types';
@@ -18,6 +19,20 @@ const useContractsFor = () => {
         useTraderStore();
     const { client } = useStore();
     const { loginid } = client;
+    const { isBridgeAvailable } = useMobileBridge();
+    const { data: remoteConfigData } = useRemoteConfig(true);
+
+    const nativeAppAllowedTradeTypes = React.useMemo(() => {
+        if (!isBridgeAvailable()) return undefined;
+        // Defensive check for edge cases
+        if (!remoteConfigData?.native_app_allowed_trade_types) {
+            // eslint-disable-next-line no-console
+            console.warn('native_app_allowed_trade_types missing from remote config');
+            // Return empty array to prevent showing unauthorized trade types on mobile if config is corrupted
+            return [];
+        }
+        return Object.values(remoteConfigData.native_app_allowed_trade_types);
+    }, [remoteConfigData, isBridgeAvailable]);
 
     // Helper function to get underlying_symbol from active_symbols
     const getUnderlyingSymbol = useCallback(
@@ -80,11 +95,14 @@ const useContractsFor = () => {
         [contract_type]
     );
 
-    const getTradeTypes = useCallback((categories: TContractTypesList) => {
-        return Array.isArray(categories) && categories.length === 0
-            ? []
-            : getTradeTypesList(categories as TContractTypesList);
-    }, []);
+    const getTradeTypes = useCallback(
+        (categories: TContractTypesList) => {
+            return Array.isArray(categories) && categories.length === 0
+                ? []
+                : getTradeTypesList(categories as TContractTypesList, nativeAppAllowedTradeTypes);
+        },
+        [nativeAppAllowedTradeTypes]
+    );
 
     const getNewContractType = useCallback(
         (trade_types: TContractType[]) => {
