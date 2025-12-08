@@ -30,7 +30,7 @@
 
     &__header {
         padding: var(--core-spacing-800);
-        padding-bottom: var(--core-spacing-400);
+        padding-bottom: 0;
         border-bottom: 0.1rem solid var(--component-divider-default);
     }
 
@@ -46,6 +46,10 @@
         justify-content: center;
         height: 100%;
         color: var(--component-textIcon-normal-subtle);
+    }
+
+    .segmented-control-single button {
+        height: 3.2rem;
     }
 }
 
