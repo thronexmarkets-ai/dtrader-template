@@ -88,6 +88,16 @@ export const AVAILABLE_CONTRACTS = [
     },
 ];
 
+/**
+ * Returns the available contracts list, filtered by native app allowed trade types if provided.
+ * @param nativeAppAllowedTradeTypes - Optional array of allowed trade type names from remote config
+ * @returns Filtered array of available contracts
+ */
+export const getAvailableContracts = (nativeAppAllowedTradeTypes?: string[]) => {
+    if (!nativeAppAllowedTradeTypes) return AVAILABLE_CONTRACTS;
+    return AVAILABLE_CONTRACTS.filter(contract => nativeAppAllowedTradeTypes.includes(contract.id));
+};
+
 export const getTradeTypesList = (
     contract_types_list: ReturnType<typeof useTraderStore>['contract_types_list'],
     nativeAppAllowedTradeTypes?: string[]

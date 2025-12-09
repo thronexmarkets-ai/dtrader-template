@@ -1,13 +1,12 @@
-import { useQuery, useRemoteConfig } from '@deriv/api';
+import { useQuery } from '@deriv/api';
 import { cloneObject, getContractCategoriesConfig, getContractTypesConfig } from '@deriv/shared';
 import { mockStore } from '@deriv/stores';
 import { waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
-
 import TraderProviders from '../../../trader-providers';
 import useContractsFor from '../useContractsFor';
+import useNativeAppAllowedTradeTypes from '../useNativeAppAllowedTradeTypes';
 
 jest.mock('@deriv/api', () => ({
     ...jest.requireActual('@deriv/api'),
@@ -15,16 +14,6 @@ jest.mock('@deriv/api', () => ({
         data: null,
         error: null,
         isLoading: false,
-    })),
-    useRemoteConfig: jest.fn(() => ({
-        data: {
-            native_app_allowed_trade_types: {
-                ACCUMULATORS: 'Accumulators',
-                VANILLAS: 'Vanillas',
-                TURBOS: 'Turbos',
-                MULTIPLIERS: 'Multipliers',
-            },
-        },
     })),
 }));
 
@@ -35,10 +24,9 @@ jest.mock('@deriv/shared', () => ({
     cloneObject: jest.fn(),
 }));
 
-jest.mock('App/Hooks/useMobileBridge', () => ({
-    useMobileBridge: jest.fn(() => ({
-        isBridgeAvailable: jest.fn(() => false),
-    })),
+jest.mock('../useNativeAppAllowedTradeTypes', () => ({
+    __esModule: true,
+    default: jest.fn(() => undefined),
 }));
 
 describe('useContractsFor', () => {
@@ -79,10 +67,8 @@ describe('useContractsFor', () => {
 
         (cloneObject as jest.Mock).mockImplementation(obj => JSON.parse(JSON.stringify(obj)));
 
-        // Reset useMobileBridge mock to default
-        (useMobileBridge as jest.Mock).mockReturnValue({
-            isBridgeAvailable: jest.fn(() => false),
-        });
+        // Reset useNativeAppAllowedTradeTypes mock to default
+        (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue(undefined);
     });
 
     afterEach(() => {
@@ -228,9 +214,7 @@ describe('useContractsFor', () => {
         });
 
         it('should not filter trade types when not a native mobile app', async () => {
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => false),
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue(undefined);
 
             (useQuery as jest.Mock).mockReturnValue({
                 data: {
@@ -255,18 +239,7 @@ describe('useContractsFor', () => {
         });
 
         it('should filter trade types when native mobile app is available', async () => {
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: {
-                    native_app_allowed_trade_types: {
-                        ACCUMULATORS: 'Accumulators',
-                        MULTIPLIERS: 'Multipliers',
-                    },
-                },
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue(['Accumulators', 'Multipliers']);
 
             (useQuery as jest.Mock).mockReturnValue({
                 data: {
@@ -291,46 +264,27 @@ describe('useContractsFor', () => {
         });
 
         it('should use remote config values from native_app_allowed_trade_types', async () => {
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
-            const mockRemoteConfig = {
-                data: {
-                    native_app_allowed_trade_types: {
-                        ACCUMULATORS: 'Accumulators',
-                        VANILLAS: 'Vanillas',
-                        TURBOS: 'Turbos',
-                        MULTIPLIERS: 'Multipliers',
-                    },
-                },
-            };
-
-            (useRemoteConfig as jest.Mock).mockReturnValue(mockRemoteConfig);
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([
+                'Accumulators',
+                'Vanillas',
+                'Turbos',
+                'Multipliers',
+            ]);
 
             renderHook(() => useContractsFor(), { wrapper });
 
             await waitFor(() => {
-                expect(useRemoteConfig).toHaveBeenCalledWith(true);
+                expect(useNativeAppAllowedTradeTypes).toHaveBeenCalled();
             });
         });
 
         it('should handle empty remote config gracefully with fallback', async () => {
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
-            // Simulate remote config with initial fallback data
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: {
-                    native_app_allowed_trade_types: {
-                        ACCUMULATORS: 'Accumulators',
-                        MULTIPLIERS: 'Multipliers',
-                        VANILLAS: 'Vanillas',
-                        TURBOS: 'Turbos',
-                    },
-                },
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([
+                'Accumulators',
+                'Multipliers',
+                'Vanillas',
+                'Turbos',
+            ]);
 
             const { result } = renderHook(() => useContractsFor(), { wrapper });
 
@@ -341,16 +295,8 @@ describe('useContractsFor', () => {
         });
 
         it('should block all trade types when native_app_allowed_trade_types is missing (fail-safe)', async () => {
-            const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
             // Simulate corrupted remote config - missing native_app_allowed_trade_types
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: {},
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([]);
 
             (useQuery as jest.Mock).mockReturnValue({
                 data: {
@@ -369,28 +315,14 @@ describe('useContractsFor', () => {
             const { result } = renderHook(() => useContractsFor(), { wrapper });
 
             await waitFor(() => {
-                // Should warn about missing config
-                expect(consoleWarnSpy).toHaveBeenCalledWith(
-                    'native_app_allowed_trade_types missing from remote config'
-                );
                 // Should block all trade types as fail-safe (empty array means filter out everything)
                 expect(result.current.trade_types).toEqual([]);
             });
-
-            consoleWarnSpy.mockRestore();
         });
 
         it('should block all trade types when remoteConfigData is null (fail-safe)', async () => {
-            const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
             // Simulate null remote config data
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: null,
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([]);
 
             (useQuery as jest.Mock).mockReturnValue({
                 data: {
@@ -406,15 +338,9 @@ describe('useContractsFor', () => {
             const { result } = renderHook(() => useContractsFor(), { wrapper });
 
             await waitFor(() => {
-                // Should warn about missing config
-                expect(consoleWarnSpy).toHaveBeenCalledWith(
-                    'native_app_allowed_trade_types missing from remote config'
-                );
                 // Should block all trade types as fail-safe
                 expect(result.current.trade_types).toEqual([]);
             });
-
-            consoleWarnSpy.mockRestore();
         });
     });
 });

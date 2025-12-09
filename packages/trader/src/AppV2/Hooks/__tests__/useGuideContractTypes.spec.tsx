@@ -1,29 +1,14 @@
-import { useRemoteConfig } from '@deriv/api';
 import { renderHook } from '@testing-library/react-hooks';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import { getTradeTypesList } from 'AppV2/Utils/trade-types-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
 
 import useGuideContractTypes from '../useGuideContractTypes';
+import useNativeAppAllowedTradeTypes from '../useNativeAppAllowedTradeTypes';
 
-jest.mock('@deriv/api', () => ({
-    useRemoteConfig: jest.fn(() => ({
-        data: {
-            native_app_allowed_trade_types: {
-                ACCUMULATORS: 'Accumulators',
-                VANILLAS: 'Vanillas',
-                TURBOS: 'Turbos',
-                MULTIPLIERS: 'Multipliers',
-            },
-        },
-    })),
-}));
-
-jest.mock('App/Hooks/useMobileBridge', () => ({
-    useMobileBridge: jest.fn(() => ({
-        isBridgeAvailable: jest.fn(() => false),
-    })),
+jest.mock('../useNativeAppAllowedTradeTypes', () => ({
+    __esModule: true,
+    default: jest.fn(() => undefined),
 }));
 
 jest.mock('Stores/useTraderStores', () => ({
@@ -43,20 +28,7 @@ describe('useGuideContractTypes', () => {
         jest.clearAllMocks();
 
         // Reset to default mocks
-        (useMobileBridge as jest.Mock).mockReturnValue({
-            isBridgeAvailable: jest.fn(() => false),
-        });
-
-        (useRemoteConfig as jest.Mock).mockReturnValue({
-            data: {
-                native_app_allowed_trade_types: {
-                    ACCUMULATORS: 'Accumulators',
-                    VANILLAS: 'Vanillas',
-                    TURBOS: 'Turbos',
-                    MULTIPLIERS: 'Multipliers',
-                },
-            },
-        });
+        (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue(undefined);
 
         (getTradeTypesList as jest.Mock).mockReturnValue([]);
     });
@@ -152,9 +124,7 @@ describe('useGuideContractTypes', () => {
                 category_1: { categories: [{ value: 'type_1', text: 'Type 1' }] },
             };
 
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => false),
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue(undefined);
 
             (useTraderStore as jest.Mock).mockReturnValue({
                 contract_types_list_v2: {},
@@ -182,18 +152,7 @@ describe('useGuideContractTypes', () => {
                 category_1: { categories: [{ value: 'accumulator', text: 'Accumulators' }] },
             };
 
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: {
-                    native_app_allowed_trade_types: {
-                        ACCUMULATORS: 'Accumulators',
-                        MULTIPLIERS: 'Multipliers',
-                    },
-                },
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue(['Accumulators', 'Multipliers']);
 
             (useTraderStore as jest.Mock).mockReturnValue({
                 contract_types_list_v2: {},
@@ -215,20 +174,12 @@ describe('useGuideContractTypes', () => {
                 category_1: { categories: [{ value: 'type_1', text: 'Type 1' }] },
             };
 
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: {
-                    native_app_allowed_trade_types: {
-                        ACCUMULATORS: 'Accumulators',
-                        VANILLAS: 'Vanillas',
-                        TURBOS: 'Turbos',
-                        MULTIPLIERS: 'Multipliers',
-                    },
-                },
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([
+                'Accumulators',
+                'Vanillas',
+                'Turbos',
+                'Multipliers',
+            ]);
 
             (useTraderStore as jest.Mock).mockReturnValue({
                 contract_types_list_v2: {},
@@ -353,9 +304,7 @@ describe('useGuideContractTypes', () => {
                 category_1: { categories: [{ value: 'type_1', text: 'Type 1' }] },
             };
 
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => false),
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue(undefined);
 
             (useTraderStore as jest.Mock).mockReturnValue({
                 contract_types_list_v2: {},
@@ -368,9 +317,12 @@ describe('useGuideContractTypes', () => {
             expect(getTradeTypesList).toHaveBeenCalledWith(mockContractList, undefined);
 
             // Change bridge availability
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([
+                'Accumulators',
+                'Vanillas',
+                'Turbos',
+                'Multipliers',
+            ]);
 
             rerender();
 
@@ -446,15 +398,7 @@ describe('useGuideContractTypes', () => {
                 category_1: { categories: [{ value: 'type_1', text: 'Type 1' }] },
             };
 
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: {
-                    native_app_allowed_trade_types: {},
-                },
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([]);
 
             (useTraderStore as jest.Mock).mockReturnValue({
                 contract_types_list_v2: {},
@@ -469,20 +413,12 @@ describe('useGuideContractTypes', () => {
         });
 
         it('should block all trade types when native_app_allowed_trade_types is missing (fail-safe)', () => {
-            const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-
             const mockContractList = {
                 category_1: { categories: [{ value: 'type_1', text: 'Type 1' }] },
             };
 
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
             // Simulate corrupted remote config - missing native_app_allowed_trade_types
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: {},
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([]);
 
             (useTraderStore as jest.Mock).mockReturnValue({
                 contract_types_list_v2: {},
@@ -494,30 +430,18 @@ describe('useGuideContractTypes', () => {
 
             const { result } = renderHook(() => useGuideContractTypes());
 
-            // Should warn about missing config
-            expect(consoleWarnSpy).toHaveBeenCalledWith('native_app_allowed_trade_types missing from remote config');
             // Should be called with empty array (blocks all trade types as fail-safe)
             expect(getTradeTypesList).toHaveBeenCalledWith(mockContractList, []);
             expect(result.current.trade_types).toEqual([]);
-
-            consoleWarnSpy.mockRestore();
         });
 
         it('should block all trade types when remoteConfigData is null (fail-safe)', () => {
-            const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-
             const mockContractList = {
                 category_1: { categories: [{ value: 'type_1', text: 'Type 1' }] },
             };
 
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
             // Simulate null remote config data
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: null,
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue([]);
 
             (useTraderStore as jest.Mock).mockReturnValue({
                 contract_types_list_v2: {},
@@ -529,13 +453,9 @@ describe('useGuideContractTypes', () => {
 
             const { result } = renderHook(() => useGuideContractTypes());
 
-            // Should warn about missing config
-            expect(consoleWarnSpy).toHaveBeenCalledWith('native_app_allowed_trade_types missing from remote config');
             // Should be called with empty array (blocks all trade types as fail-safe)
             expect(getTradeTypesList).toHaveBeenCalledWith(mockContractList, []);
             expect(result.current.trade_types).toEqual([]);
-
-            consoleWarnSpy.mockRestore();
         });
 
         it('should handle both contract_types_list and contract_types_list_v2 being populated', () => {
@@ -569,20 +489,7 @@ describe('useGuideContractTypes', () => {
                 category_1: { categories: [{ value: 'type_1', text: 'Type 1' }] },
             };
 
-            (useMobileBridge as jest.Mock).mockReturnValue({
-                isBridgeAvailable: jest.fn(() => true),
-            });
-
-            const customRemoteConfig = {
-                ACCUMULATORS: 'Accumulators',
-                VANILLAS: 'Vanillas',
-            };
-
-            (useRemoteConfig as jest.Mock).mockReturnValue({
-                data: {
-                    native_app_allowed_trade_types: customRemoteConfig,
-                },
-            });
+            (useNativeAppAllowedTradeTypes as jest.Mock).mockReturnValue(['Accumulators', 'Vanillas']);
 
             (useTraderStore as jest.Mock).mockReturnValue({
                 contract_types_list_v2: {},
@@ -593,18 +500,6 @@ describe('useGuideContractTypes', () => {
             renderHook(() => useGuideContractTypes());
 
             expect(getTradeTypesList).toHaveBeenCalledWith(mockContractList, ['Accumulators', 'Vanillas']);
-        });
-
-        it('should call useRemoteConfig with true parameter', () => {
-            (useTraderStore as jest.Mock).mockReturnValue({
-                contract_types_list_v2: {},
-                contract_types_list: {},
-                is_dtrader_v2: false,
-            });
-
-            renderHook(() => useGuideContractTypes());
-
-            expect(useRemoteConfig).toHaveBeenCalledWith(true);
         });
     });
 });

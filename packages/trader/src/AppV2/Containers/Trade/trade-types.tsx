@@ -6,6 +6,7 @@ import { safeParse } from '@deriv/utils';
 import { ActionSheet, Button, Chip, Text } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
+import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import Carousel from 'AppV2/Components/Carousel';
 import CarouselHeader from 'AppV2/Components/Carousel/carousel-header';
 import TradeTypesSelectionGuide from 'AppV2/Components/OnboardingGuide/TradeTypesSelectionGuide';
@@ -45,9 +46,11 @@ export type TResultItem = {
 
 const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mode_on }: TTradeTypesProps) => {
     const { localize } = useTranslations();
+    const { isBridgeAvailable } = useMobileBridge();
     const [is_open, setIsOpen] = React.useState<boolean>(false);
     const [is_editing, setIsEditing] = React.useState<boolean>(false);
     const trade_types_ref = React.useRef<HTMLDivElement>(null);
+    const is_bridge_available = isBridgeAvailable();
 
     const createArrayFromCategories = (data: TTradeTypesProps['trade_types']): TItem[] => {
         const result: TItem[] = [];
@@ -274,7 +277,7 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
                     <Text size='sm'>{title}</Text>
                 </Chip.Selectable>
             ))}
-            {should_show_view_all && (
+            {should_show_view_all && !is_bridge_available && (
                 <Button
                     key='trade-types-all'
                     onClick={handleOpenActionSheet}

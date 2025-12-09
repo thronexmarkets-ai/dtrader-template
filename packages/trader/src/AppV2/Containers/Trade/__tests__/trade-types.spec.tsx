@@ -4,6 +4,7 @@ import { mockStore } from '@deriv/stores';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
+import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import { getTradeTypesList, sortCategoriesInTradeTypeOrder } from 'AppV2/Utils/trade-types-utils';
 
 import TraderProviders from '../../../../trader-providers';
@@ -12,6 +13,12 @@ import TradeTypes from '../trade-types';
 jest.mock('AppV2/Utils/trade-types-utils');
 
 jest.mock('AppV2/Components/Guide', () => jest.fn(() => <div>MockedGuide</div>));
+
+jest.mock('App/Hooks/useMobileBridge', () => ({
+    useMobileBridge: jest.fn(() => ({
+        isBridgeAvailable: jest.fn(() => false),
+    })),
+}));
 
 const mockGetTradeTypesList = getTradeTypesList as jest.MockedFunction<typeof getTradeTypesList>;
 const mockSortCategoriesInTradeTypeOrder = sortCategoriesInTradeTypeOrder as jest.Mock;
@@ -66,6 +73,11 @@ describe('TradeTypes', () => {
             { value: 'vanilla_call', text: 'Vanilla Call' },
             { value: 'vanilla_put', text: 'Vanilla Put' },
         ]);
+
+        // Reset useMobileBridge mock to default (bridge not available)
+        (useMobileBridge as jest.Mock).mockReturnValue({
+            isBridgeAvailable: jest.fn(() => false),
+        });
     });
     beforeAll(() => {
         Object.defineProperty(HTMLElement.prototype, 'scrollBy', {
@@ -107,5 +119,25 @@ describe('TradeTypes', () => {
         await userEvent.click(screen.getByText('Rise'));
         await new Promise(resolve => setTimeout(resolve, 0));
         expect(scrollByMock).toHaveBeenCalled();
+    });
+
+    it('should show "View all" button when mobile bridge is not available (web app)', () => {
+        (useMobileBridge as jest.Mock).mockReturnValue({
+            isBridgeAvailable: jest.fn(() => false),
+        });
+
+        render(mockTradeTypes());
+
+        expect(screen.getByText('View all')).toBeInTheDocument();
+    });
+
+    it('should hide "View all" button when mobile bridge is available (native mobile app)', () => {
+        (useMobileBridge as jest.Mock).mockReturnValue({
+            isBridgeAvailable: jest.fn(() => true),
+        });
+
+        render(mockTradeTypes());
+
+        expect(screen.queryByText('View all')).not.toBeInTheDocument();
     });
 });

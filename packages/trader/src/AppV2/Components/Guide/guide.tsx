@@ -1,15 +1,15 @@
 import React from 'react';
 
 import { LabelPairedPresentationScreenSmRegularIcon } from '@deriv/quill-icons';
+import { trackAnalyticsEvent } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { Localize } from '@deriv-com/translations';
 import { Button, Text } from '@deriv-com/quill-ui';
 
+import useAvailableContracts from 'AppV2/Hooks/useAvailableContracts';
 import useGuideContractTypes from 'AppV2/Hooks/useGuideContractTypes';
-import { AVAILABLE_CONTRACTS, CONTRACT_LIST } from 'AppV2/Utils/trade-types-utils';
+import { CONTRACT_LIST } from 'AppV2/Utils/trade-types-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
-
-import { trackAnalyticsEvent } from '@deriv/shared';
 
 import GuideDefinitionModal from './guide-definition-modal';
 import GuideDescriptionModal from './guide-description-modal';
@@ -35,7 +35,8 @@ const Guide = observer(
             common: { current_language },
         } = useStore();
         const { contract_type } = useTraderStore();
-        const contract_type_title = AVAILABLE_CONTRACTS.find(item => item.for.includes(contract_type))?.id ?? '';
+        const available_contracts = useAvailableContracts();
+        const contract_type_title = available_contracts.find(item => item.for.includes(contract_type))?.id ?? '';
         const { trade_types } = useGuideContractTypes();
         const order = [
             CONTRACT_LIST.RISE_FALL,
@@ -50,7 +51,7 @@ const Guide = observer(
             CONTRACT_LIST.OVER_UNDER,
         ];
 
-        const filtered_contract_list = AVAILABLE_CONTRACTS.filter(contract =>
+        const filtered_contract_list = available_contracts.filter(contract =>
             trade_types.some((trade: { text?: string }) => trade.text === contract.id)
         );
 

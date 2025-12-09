@@ -1,15 +1,16 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 
-import { useQuery, useRemoteConfig } from '@deriv/api';
+import { useQuery } from '@deriv/api';
 import { cloneObject, getContractCategoriesConfig, getContractTypesConfig, setTradeURLParams } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import { checkContractTypePrefix } from 'AppV2/Utils/contract-type';
 import { getTradeTypesList } from 'AppV2/Utils/trade-types-utils';
 import { TContractType } from 'Modules/Trading/Components/Form/ContractType/types';
 import { useTraderStore } from 'Stores/useTraderStores';
 import { TConfig, TContractTypesList } from 'Types';
+
+import useNativeAppAllowedTradeTypes from './useNativeAppAllowedTradeTypes';
 
 const useContractsFor = () => {
     const [contract_types_list, setContractTypesList] = React.useState<TContractTypesList | []>([]);
@@ -19,21 +20,7 @@ const useContractsFor = () => {
         useTraderStore();
     const { client } = useStore();
     const { loginid } = client;
-    const { isBridgeAvailable } = useMobileBridge();
-    const { data: remoteConfigData } = useRemoteConfig(true);
-    const is_bridge_available = isBridgeAvailable();
-
-    const nativeAppAllowedTradeTypes = React.useMemo(() => {
-        if (!is_bridge_available) return undefined;
-        // Defensive check for edge cases
-        if (!remoteConfigData?.native_app_allowed_trade_types) {
-            // eslint-disable-next-line no-console
-            console.warn('native_app_allowed_trade_types missing from remote config');
-            // Return empty array to prevent showing unauthorized trade types on mobile if config is corrupted
-            return [];
-        }
-        return Object.values(remoteConfigData.native_app_allowed_trade_types);
-    }, [remoteConfigData, is_bridge_available]);
+    const nativeAppAllowedTradeTypes = useNativeAppAllowedTradeTypes();
 
     // Helper function to get underlying_symbol from active_symbols
     const getUnderlyingSymbol = useCallback(

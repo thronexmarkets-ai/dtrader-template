@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
 
-import { useRemoteConfig } from '@deriv/api';
-
-import { useMobileBridge } from 'App/Hooks/useMobileBridge';
 import { getTradeTypesList } from 'AppV2/Utils/trade-types-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
+
+import useNativeAppAllowedTradeTypes from './useNativeAppAllowedTradeTypes';
 
 /**
  * Lightweight hook for Guide component that uses existing trade store data
@@ -13,21 +12,7 @@ import { useTraderStore } from 'Stores/useTraderStores';
  */
 const useGuideContractTypes = () => {
     const { contract_types_list_v2, contract_types_list, is_dtrader_v2 } = useTraderStore();
-    const { isBridgeAvailable } = useMobileBridge();
-    const { data: remoteConfigData } = useRemoteConfig(true);
-    const is_bridge_available = isBridgeAvailable();
-
-    const nativeAppAllowedTradeTypes = useMemo(() => {
-        if (!is_bridge_available) return undefined;
-        // Defensive check for edge cases
-        if (!remoteConfigData?.native_app_allowed_trade_types) {
-            // eslint-disable-next-line no-console
-            console.warn('native_app_allowed_trade_types missing from remote config');
-            // Return empty array to prevent showing unauthorized trade types on mobile if config is corrupted
-            return [];
-        }
-        return Object.values(remoteConfigData.native_app_allowed_trade_types);
-    }, [remoteConfigData, is_bridge_available]);
+    const nativeAppAllowedTradeTypes = useNativeAppAllowedTradeTypes();
 
     const trade_types = useMemo(() => {
         // Use the appropriate contract types list based on dtrader version

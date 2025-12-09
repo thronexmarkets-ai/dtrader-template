@@ -7,12 +7,62 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { getTerm } from 'AppV2/Utils/contract-description-utils';
-import { AVAILABLE_CONTRACTS, CONTRACT_LIST } from 'AppV2/Utils/trade-types-utils';
+import { CONTRACT_LIST } from 'AppV2/Utils/trade-types-utils';
 
 import TraderProviders from '../../../../trader-providers';
 import Guide from '../guide';
 
 const trade_types = 'Trade types';
+
+// Mock available contracts - matches the structure returned by useAvailableContracts
+const mockAvailableContracts = [
+    {
+        tradeType: 'Accumulators',
+        id: CONTRACT_LIST.ACCUMULATORS,
+        for: [TRADE_TYPES.ACCUMULATOR],
+    },
+    {
+        tradeType: 'Vanillas',
+        id: CONTRACT_LIST.VANILLAS,
+        for: [TRADE_TYPES.VANILLA.CALL, TRADE_TYPES.VANILLA.PUT],
+    },
+    {
+        tradeType: 'Turbos',
+        id: CONTRACT_LIST.TURBOS,
+        for: [TRADE_TYPES.TURBOS.LONG, TRADE_TYPES.TURBOS.SHORT],
+    },
+    {
+        tradeType: 'Multipliers',
+        id: CONTRACT_LIST.MULTIPLIERS,
+        for: [TRADE_TYPES.MULTIPLIER],
+    },
+    {
+        tradeType: 'Rise/Fall',
+        id: CONTRACT_LIST.RISE_FALL,
+        for: [TRADE_TYPES.RISE_FALL, TRADE_TYPES.RISE_FALL_EQUAL],
+    },
+    {
+        tradeType: 'Higher/Lower',
+        id: CONTRACT_LIST.HIGHER_LOWER,
+        for: [TRADE_TYPES.HIGH_LOW],
+    },
+    {
+        tradeType: 'Touch/No Touch',
+        id: CONTRACT_LIST.TOUCH_NO_TOUCH,
+        for: [TRADE_TYPES.TOUCH],
+    },
+    {
+        tradeType: 'Matches/Differs',
+        id: CONTRACT_LIST.MATCHES_DIFFERS,
+        for: [TRADE_TYPES.MATCH_DIFF],
+    },
+    { tradeType: 'Even/Odd', id: CONTRACT_LIST.EVEN_ODD, for: [TRADE_TYPES.EVEN_ODD] },
+    {
+        tradeType: 'Over/Under',
+        id: CONTRACT_LIST.OVER_UNDER,
+        for: [TRADE_TYPES.OVER_UNDER],
+    },
+];
 
 const mock_contract_data = [
     {
@@ -98,6 +148,11 @@ jest.mock('AppV2/Hooks/useGuideContractTypes', () => ({
     })),
 }));
 
+jest.mock('AppV2/Hooks/useAvailableContracts', () => ({
+    __esModule: true,
+    default: jest.fn(() => mockAvailableContracts),
+}));
+
 Loadable.preloadAll();
 
 describe('Guide', () => {
@@ -132,7 +187,7 @@ describe('Guide', () => {
         await userEvent.click(screen.getByRole('button'));
 
         expect(screen.getByText(trade_types)).toBeInTheDocument();
-        AVAILABLE_CONTRACTS.forEach(({ id }) => expect(screen.getByText(id)).toBeInTheDocument());
+        mockAvailableContracts.forEach(({ id }) => expect(screen.getByText(id)).toBeInTheDocument());
     });
 
     it('should render component with description for only for selected trade type if show_guide_for_selected_contract === true', async () => {
@@ -143,7 +198,7 @@ describe('Guide', () => {
         expect(screen.queryByText(trade_types)).not.toBeInTheDocument();
         expect(screen.getByText(CONTRACT_LIST.RISE_FALL)).toBeInTheDocument();
 
-        AVAILABLE_CONTRACTS.forEach(({ id }) =>
+        mockAvailableContracts.forEach(({ id }) =>
             id === CONTRACT_LIST.RISE_FALL
                 ? expect(screen.getByText(id)).toBeInTheDocument()
                 : expect(screen.queryByText(id)).not.toBeInTheDocument()
