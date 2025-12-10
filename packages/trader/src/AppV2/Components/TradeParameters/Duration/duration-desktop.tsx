@@ -159,6 +159,7 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
                 isOpen={isPopoverOpen}
                 onClose={handleClosePopover}
                 triggerRef={inputRef}
+                popoverWidth={424}
                 className='duration-popover'
             >
                 <div className='duration-popover__layout'>
