@@ -452,9 +452,8 @@ const StakeInput = observer(({ onClose, is_open }: TStakeInput) => {
                     onClick={onSave}
                     disabled={is_loading_proposal || !!fe_stake_error || !!(should_show_stake_error && stake_error)}
                     className='stake-input-desktop__save-button'
-                >
-                    <Localize i18n_default_text='Save' />
-                </Button>
+                    label={localize('Save')}
+                />
             </div>
         </div>
     );
