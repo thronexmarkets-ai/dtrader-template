@@ -1,7 +1,8 @@
-.duration-unit-selector {
+.vertical-tab-selector {
     display: flex;
     flex-direction: column;
     width: 100%;
+    padding: 0;
 
     &__item {
         position: relative;
@@ -36,6 +37,7 @@
                 height: 2.4rem;
                 width: 0.4rem;
                 background-color: var(--core-color-solid-red-900);
+                border-radius: 50px;
             }
         }
     }

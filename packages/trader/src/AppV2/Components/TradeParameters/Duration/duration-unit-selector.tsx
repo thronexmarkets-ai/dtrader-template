@@ -1,12 +1,9 @@
-import React from 'react';
-import clsx from 'clsx';
+import React, { useMemo } from 'react';
 
-import { Localize } from '@deriv-com/translations';
+import { localize } from '@deriv-com/translations';
 
-interface DurationUnit {
-    value: string;
-    label: string;
-}
+import type { VerticalTabItem } from '../../InputPopover/vertical-tab-selector';
+import VerticalTabSelector from '../../InputPopover/vertical-tab-selector';
 
 interface DurationUnitSelectorProps {
     selectedUnit: string;
@@ -14,31 +11,26 @@ interface DurationUnitSelectorProps {
     className?: string;
 }
 
-const DURATION_UNITS: DurationUnit[] = [
-    { value: 't', label: 'Ticks' },
-    { value: 's', label: 'Seconds' },
-    { value: 'm', label: 'Minutes' },
-    { value: 'h', label: 'Hours' },
-    { value: 'end_time', label: 'End time' },
-    { value: 'end_date', label: 'End date' },
-];
-
 const DurationUnitSelector: React.FC<DurationUnitSelectorProps> = ({ selectedUnit, onSelectUnit, className }) => {
+    const DURATION_UNITS: VerticalTabItem[] = useMemo(
+        () => [
+            { value: 't', label: localize('Ticks') },
+            { value: 's', label: localize('Seconds') },
+            { value: 'm', label: localize('Minutes') },
+            { value: 'h', label: localize('Hours') },
+            { value: 'end_time', label: localize('End time') },
+            { value: 'end_date', label: localize('End date') },
+        ],
+        []
+    );
+
     return (
-        <div className={clsx('duration-unit-selector', className)}>
-            {DURATION_UNITS.map(unit => (
-                <button
-                    key={unit.value}
-                    className={clsx('duration-unit-selector__item', {
-                        'duration-unit-selector__item--selected': selectedUnit === unit.value,
-                    })}
-                    onClick={() => onSelectUnit(unit.value)}
-                    type='button'
-                >
-                    <Localize i18n_default_text={unit.label} />
-                </button>
-            ))}
-        </div>
+        <VerticalTabSelector
+            items={DURATION_UNITS}
+            selectedValue={selectedUnit}
+            onSelect={onSelectUnit}
+            className={className}
+        />
     );
 };
 

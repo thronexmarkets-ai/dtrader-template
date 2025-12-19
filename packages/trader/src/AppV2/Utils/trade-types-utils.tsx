@@ -141,12 +141,11 @@ export const getDisplayedContractTypes = (
         return available_types.sort((a, b) => getSortedIndex(a) - getSortedIndex(b));
     }
 
-    // Special handling for trade types with tabs but empty trade_types object
-    // This can happen when the store hasn't been properly populated yet
+    // If trade_types is empty but we have tabs, use contract_type directly
+    // This ensures immediate rendering with the correct button type
     if (available_types.length === 0 && trade_type_tabs.length > 0) {
-        // Return the contract types from the tabs configuration
-        const fallback_types = trade_type_tabs.map(tab => tab.contract_type);
-        return fallback_types.sort((a, b) => getSortedIndex(a) - getSortedIndex(b));
+        // Return only the current contract_type, not all tab types
+        return [contract_type];
     }
 
     // If trade_type_tab is set, filter by it
