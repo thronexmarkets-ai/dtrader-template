@@ -7,6 +7,8 @@ jest.mock('@deriv/shared', () => ({
     WS: {
         statement: jest.fn(),
         forgetAll: jest.fn(),
+        setOnReconnect: jest.fn(),
+        removeOnReconnect: jest.fn(),
     },
 }));
 

@@ -375,6 +375,7 @@ export default class TradeStore extends BaseStore {
     is_initial_barrier_applied = false;
     is_digits_widget_active = false;
     should_skip_prepost_lifecycle = false;
+    reconnectHandler?: () => void;
     constructor({ root_store }: { root_store: TRootStore }) {
         const local_storage_properties = [
             'amount',
@@ -2005,6 +2006,18 @@ export default class TradeStore extends BaseStore {
         this.onLogout(this.logoutListener);
         this.onClientInit(this.clientInitListener);
         this.onNetworkStatusChange(this.networkStatusChangeListener);
+
+        // Add reconnection handler - onReconnect is only called when account_id exists
+        // so we don't need to check is_logged_in here
+        // Store the handler so we can remove it later
+        this.reconnectHandler = () => {
+            if (this.is_trade_component_mounted) {
+                this.refresh();
+                this.debouncedProposal();
+            }
+        };
+        WS.setOnReconnect(this.reconnectHandler);
+
         this.setChartModeFromURL();
         this.setChartStatus(true);
         runInAction(async () => {
@@ -2063,6 +2076,9 @@ export default class TradeStore extends BaseStore {
         this.disposeClientInit();
         this.disposeNetworkStatusChange();
         this.disposeThemeChange();
+        if (this.reconnectHandler) {
+            WS.removeOnReconnect(this.reconnectHandler);
+        }
         this.is_trade_component_mounted = false;
         this.clearV2ParamsInitialValues();
         // TODO: Find a more elegant solution to unmount contract-trade-store

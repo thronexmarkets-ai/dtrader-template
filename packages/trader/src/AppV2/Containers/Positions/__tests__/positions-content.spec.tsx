@@ -44,6 +44,8 @@ jest.mock('@deriv/shared', () => ({
         tradingTimes: jest.fn(),
         wait: jest.fn(),
         profitTable: jest.fn().mockReturnValue({ profit_table: { transactions: [] } }),
+        setOnReconnect: jest.fn(),
+        removeOnReconnect: jest.fn(),
     },
 }));
 

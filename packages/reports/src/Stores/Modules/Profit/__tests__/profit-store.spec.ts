@@ -14,6 +14,8 @@ jest.mock('@deriv/shared', () => {
         ...jest.requireActual('@deriv/shared'),
         WS: {
             forgetAll: jest.fn(),
+            setOnReconnect: jest.fn(),
+            removeOnReconnect: jest.fn(),
             profitTable: jest.fn().mockReturnValue({
                 profit_table: {
                     transactions: [

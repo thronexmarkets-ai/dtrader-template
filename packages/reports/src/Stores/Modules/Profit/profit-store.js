@@ -1,5 +1,5 @@
 import debounce from 'lodash.debounce';
-import { action, computed, makeObservable, observable, override, when } from 'mobx';
+import { action, computed, makeObservable, observable, override, reaction } from 'mobx';
 
 import { filterDisabledPositions, mapErrorMessage, toMoment, WS } from '@deriv/shared';
 
@@ -127,21 +127,36 @@ export default class ProfitTableStore extends BaseStore {
         then the sold contract won't be there in profit_table when visited again unless we fetch it again.
         Caching will only work if the date filtering happens based on `sell_time` of a contract in BE. */
 
-        // Use 'when' to wait for authentication before fetching data
-        // This prevents race conditions on direct page load where the component
-        // mounts before authentication completes
-        when(
-            () => this.root_store.client.is_logged_in,
-            () => {
-                this.fetchNextBatch(shouldFilterContractTypes, true);
-            }
-        );
+        // Check current state first to handle both initial connection and reconnection
+        if (this.root_store.client.is_logged_in) {
+            this.fetchNextBatch(shouldFilterContractTypes, true);
+        } else {
+            reaction(
+                () => this.root_store.client.is_logged_in,
+                () => {
+                    if (this.root_store.client.is_logged_in) {
+                        this.fetchNextBatch(shouldFilterContractTypes, true);
+                    }
+                }
+            );
+        }
+
+        // Add reconnection handler - onReconnect is only called when account_id exists
+        // Store the handler so we can remove it later
+        this.reconnectHandler = () => {
+            this.clearTable();
+            this.fetchNextBatch(shouldFilterContractTypes, true);
+        };
+        WS.setOnReconnect(this.reconnectHandler);
     }
 
     /* DO NOT call clearDateFilter() upon unmounting the component, date filters should stay
     as we change tab or click on any contract for later references as discussed with UI/UX and QA */
     onUnmount() {
         WS.forgetAll('proposal');
+        if (this.reconnectHandler) {
+            WS.removeOnReconnect(this.reconnectHandler);
+        }
     }
 
     get totals() {

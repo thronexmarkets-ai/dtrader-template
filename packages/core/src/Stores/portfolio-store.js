@@ -1,5 +1,5 @@
 import throttle from 'lodash.throttle';
-import { action, computed, makeObservable, observable, override, runInAction, when } from 'mobx';
+import { action, computed, makeObservable, observable, override, reaction, runInAction } from 'mobx';
 import { computedFn } from 'mobx-utils';
 
 import { Money } from '@deriv/components';
@@ -545,17 +545,30 @@ export default class PortfolioStore extends BaseStore {
     onMount() {
         this.onNetworkStatusChange(this.networkStatusChangeListener);
         this.onLogout(this.logoutListener);
+
         if (this.positions.length === 0 && !this.has_subscribed_to_poc_and_transaction) {
-            // Use 'when' instead of 'reaction' to handle race conditions on direct page load
-            // 'when' checks the condition immediately and fires if already true, preventing
-            // the race condition where is_logged_in becomes true before the reaction is set up
-            when(
-                () => this.root_store.client.is_logged_in,
-                () => {
-                    this.initializePortfolio();
-                }
-            );
+            // Check current state first to handle both initial connection and reconnection
+            if (this.root_store.client.is_logged_in) {
+                this.initializePortfolio();
+            } else {
+                reaction(
+                    () => this.root_store.client.is_logged_in,
+                    () => {
+                        if (this.root_store.client.is_logged_in) {
+                            this.initializePortfolio();
+                        }
+                    }
+                );
+            }
         }
+
+        // Add reconnection handler - onReconnect is only called when account_id exists
+        // so we don't need to check is_logged_in here
+        // Store the handler so we can remove it later
+        this.reconnectHandler = () => {
+            this.initializePortfolio();
+        };
+        WS.setOnReconnect(this.reconnectHandler);
     }
 
     onUnmount() {
@@ -563,6 +576,9 @@ export default class PortfolioStore extends BaseStore {
         if (!is_reports_path) {
             this.clearTable();
             this.disposeLogout();
+        }
+        if (this.reconnectHandler) {
+            WS.removeOnReconnect(this.reconnectHandler);
         }
     }
 

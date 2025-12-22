@@ -15,7 +15,8 @@ const BinarySocketBase = (() => {
     let is_disconnect_called = false;
     let is_connected_before = false;
     let is_switching_socket = false;
-    let close_handler = null;
+    let reconnect_handlers = []; // Array to store multiple reconnection handlers
+    let connection_start_time = 0; // Track connection start time for error detection
 
     const availability = {
         is_up: true,
@@ -83,43 +84,20 @@ const BinarySocketBase = (() => {
 
         if (isClose()) {
             is_disconnect_called = false;
+            connection_start_time = Date.now(); // Track connection start time
             binary_socket = new WebSocket(getSocketUrl(session_id));
 
-            // Remove previous close handler if it exists to prevent memory leaks
-            if (close_handler && binary_socket) {
-                binary_socket.removeEventListener('close', close_handler);
-            }
+            // Add error event listener for immediate connection failures
+            binary_socket.addEventListener('error', error_event => {
+                // eslint-disable-next-line no-console
+                console.error('WebSocket error:', error_event);
 
-            // Add native WebSocket close event listener to detect abnormal closures
-            close_handler = event => {
-                // Check for abnormal closure (code 1006) which indicates connection rejected
-                if (event.code === 1006 && getAccountId()) {
-                    // Clear any credentials that might be invalid
-                    const { clearAccountId } = require('@deriv/shared');
-                    clearAccountId();
-                    localStorage.removeItem('account_type');
-                    localStorage.removeItem('active_loginid');
-                    sessionStorage.removeItem('active_loginid');
-                    localStorage.removeItem('current_account');
-
-                    // Notify via callback if configured
-                    if (typeof config.onAuthError === 'function') {
-                        config.onAuthError({
-                            code: event.code,
-                            message: 'Invalid credentials. Connection rejected by server.',
-                        });
-                    }
-
-                    // Reconnect to public endpoint after a short delay
-                    setTimeout(() => {
-                        if (isClose()) {
-                            openNewConnection();
-                        }
-                    }, 100);
+                // Check if connection closed immediately (within 2 seconds)
+                const connection_duration = Date.now() - connection_start_time;
+                if (connection_duration < 2000 && typeof config.onConnectionError === 'function') {
+                    config.onConnectionError(error_event);
                 }
-            };
-
-            binary_socket.addEventListener('close', close_handler);
+            });
 
             deriv_api = new DerivAPIBasic({
                 connection: binary_socket,
@@ -136,16 +114,29 @@ const BinarySocketBase = (() => {
             const account_id = getAccountId();
 
             if (account_id) {
+                // Only reset authorization state on initial connection, not on reconnection
+                // On reconnection, user is still logged in and is_authorize should remain true
+                // This allows stores' reaction() to work correctly on reconnection
+                if (client_store && !is_connected_before) {
+                    client_store.setIsAuthorize(false);
+                }
+
                 // Subscribe to balance immediately - this also confirms authorization
                 subscribeBalance();
+
+                // Call all reconnection handlers on reconnection (same timing as old system)
+                // Subscriptions will be queued by deriv-api until authorization completes
+                if (is_connected_before && reconnect_handlers.length > 0) {
+                    reconnect_handlers.forEach(handler => {
+                        if (typeof handler === 'function') {
+                            handler();
+                        }
+                    });
+                }
             }
 
             if (typeof config.onOpen === 'function') {
                 config.onOpen(isReady());
-            }
-
-            if (typeof config.onReconnect === 'function' && is_connected_before) {
-                config.onReconnect();
             }
 
             if (!is_connected_before) {
@@ -435,19 +426,25 @@ const BinarySocketBase = (() => {
             config.onDisconnect = onDisconnect;
         },
         setOnReconnect: onReconnect => {
-            config.onReconnect = onReconnect;
+            // Add handler to array if it's not already there
+            if (typeof onReconnect === 'function' && !reconnect_handlers.includes(onReconnect)) {
+                reconnect_handlers.push(onReconnect);
+            }
         },
-        setOnAuthError: onAuthError => {
-            config.onAuthError = onAuthError;
-        },
-        removeOnReconnect: () => {
-            delete config.onReconnect;
+        removeOnReconnect: onReconnect => {
+            // If a specific handler is provided, remove only that one
+            if (typeof onReconnect === 'function') {
+                const index = reconnect_handlers.indexOf(onReconnect);
+                if (index > -1) {
+                    reconnect_handlers.splice(index, 1);
+                }
+            } else {
+                // If no handler provided, clear all handlers (backward compatibility)
+                reconnect_handlers = [];
+            }
         },
         removeOnDisconnect: () => {
             delete config.onDisconnect;
-        },
-        removeOnAuthError: () => {
-            delete config.onAuthError;
         },
         cache: delegateToObject({}, () => deriv_api.cache),
         storage: delegateToObject({}, () => deriv_api.storage),

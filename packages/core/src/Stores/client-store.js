@@ -21,7 +21,6 @@ import { getInitialLanguage, localize } from '@deriv-com/translations';
 import { CountryUtils } from '@deriv-com/utils';
 
 import { checkWhoAmI, requestRestLogout, WS } from 'Services';
-import BinarySocketGeneral from 'Services/socket-general';
 
 import { getClientAccountType } from './Helpers/client';
 import { buildCurrenciesList } from './Modules/Trading/Helpers/currency';
@@ -114,7 +113,6 @@ export default class ClientStore extends BaseStore {
             setShouldRedirectToLogin: action.bound,
             init: action.bound,
             resetVirtualBalance: action.bound,
-            waitForBalanceResponse: action.bound,
             is_crypto: action.bound,
         });
 
@@ -312,15 +310,6 @@ export default class ClientStore extends BaseStore {
         // Remove any legacy token parameters from URL
         this.removeTokenFromUrl();
 
-        // Set up auth error handler for WebSocket code 1006 errors
-        BinarySocket.setOnAuthError(error => {
-            this.root_store.common.setError(true, {
-                header: localize('Authentication Failed'),
-                message: error.message || localize('Invalid credentials. Please try again.'),
-                should_show_refresh: false,
-            });
-        });
-
         let search = '';
         try {
             search = SessionStore?.get?.('signup_query_param') || window?.location?.search || '';
@@ -334,26 +323,22 @@ export default class ClientStore extends BaseStore {
         const loginid_param = search_params?.get('loginid');
 
         const account_id = getAccountId();
-        let authorize_response;
 
         if (account_id) {
             // Set is_logging_in to true while we wait for authorization
             this.setIsLoggingIn(true);
 
             // Wait for balance response which serves as authorization
+            // socket-general.js will handle the balance response and call authorizeAccount()
             try {
-                authorize_response = await this.waitForBalanceResponse();
+                await BinarySocket.wait('balance');
             } catch (error) {
                 // eslint-disable-next-line no-console
                 console.error('[Auth] Balance timeout:', error);
                 // Clear invalid credentials and retry as public
                 clearAccountId();
                 localStorage.removeItem('account_type');
-                authorize_response = null;
             }
-        } else {
-            // No authentication available - continue with logged-out state
-            authorize_response = null;
         }
 
         // Handle special action parameters and user_id for both logged-in and logged-out states
@@ -376,16 +361,8 @@ export default class ClientStore extends BaseStore {
             }
         }
 
-        // Process successful authentication
-        if (authorize_response) {
-            // Ensure loginid is set from the authorize response
-            this.setLoginId(authorize_response.authorize.loginid);
-
-            // Store active_loginid for backward compatibility
-            localStorage.setItem('active_loginid', authorize_response.authorize.loginid);
-            sessionStorage.setItem('active_loginid', authorize_response.authorize.loginid);
-
-            BinarySocketGeneral.authorizeAccount(authorize_response);
+        // Analytics and GTM for logged-in users
+        if (this.is_logged_in) {
             Analytics.identifyEvent(this.user_id);
 
             await this.root_store.gtm.pushDataLayer({
@@ -393,8 +370,8 @@ export default class ClientStore extends BaseStore {
             });
         }
 
-        // Handle redirect and language settings for successful authentication
-        if (authorize_response) {
+        // Handle redirect and language settings for logged-in users
+        if (this.is_logged_in) {
             if (redirect_url) {
                 const redirect_route = routes[redirect_url].length > 1 ? routes[redirect_url] : '';
                 const has_action = [
@@ -412,7 +389,7 @@ export default class ClientStore extends BaseStore {
                 }
             }
 
-            const language = authorize_response.authorize.preferred_language || getInitialLanguage();
+            const language = this.current_account?.preferred_language || getInitialLanguage();
             const stored_language_without_double_quotes = LocalStore.get(LANGUAGE_KEY).replace(/"/g, '');
             if (stored_language_without_double_quotes && language !== stored_language_without_double_quotes) {
                 window.history.replaceState({}, document.title, urlForLanguage(language));
@@ -452,7 +429,6 @@ export default class ClientStore extends BaseStore {
         }
 
         // Set up visibility change listener to check whoami when tab becomes visible
-        // Note: Initial whoami check is now done at the start of init() before WebSocket connection
         this.setupVisibilityListener();
 
         return true;
@@ -498,49 +474,6 @@ export default class ClientStore extends BaseStore {
             document.removeEventListener('visibilitychange', this.tab_visibility_handler);
             this.tab_visibility_handler = null;
         }
-    }
-
-    waitForBalanceResponse() {
-        return new Promise((resolve, reject) => {
-            let subscription = null;
-            let balance_received = false;
-
-            const timeout = setTimeout(() => {
-                if (subscription) subscription.unsubscribe();
-                reject(new Error('Balance response timeout'));
-            }, 10000); // 10 second timeout
-
-            // Subscribe to messages using deriv_api's onMessage
-            subscription = BinarySocket.get()
-                .onMessage()
-                .subscribe(({ data: response }) => {
-                    if (response.msg_type === 'balance' && !balance_received) {
-                        balance_received = true;
-                        clearTimeout(timeout);
-
-                        const balance_data = response.balance;
-
-                        // Transform balance response to authorize format
-                        const authorize_response = {
-                            authorize: {
-                                loginid: balance_data.loginid || getAccountId(),
-                                balance: balance_data.balance,
-                                currency: balance_data.currency || 'USD',
-                                email: balance_data.email || '',
-                                landing_company_name: balance_data.landing_company_name || 'svg',
-                                country: balance_data.country || '',
-                                user_id: balance_data.user_id || '',
-                                preferred_language: balance_data.preferred_language || 'EN',
-                            },
-                        };
-
-                        // Unsubscribe from messages
-                        subscription.unsubscribe();
-
-                        resolve(authorize_response);
-                    }
-                });
-        });
     }
 
     setLoginId(loginid) {
