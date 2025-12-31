@@ -298,6 +298,7 @@ const mock = (): TStores & { is_mock: boolean } => {
             setBarriersLoadingState(is_loading: boolean): void {
                 throw new Error('Function not implemented.');
             },
+            clearClosedContractMarkers: jest.fn(),
         },
         modules: {
             positions: {

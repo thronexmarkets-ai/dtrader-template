@@ -81,6 +81,7 @@ export default class ContractTradeStore extends BaseStore {
             prev_contract: computed,
             savePreviousChartMode: action.bound,
             setNewAccumulatorBarriersData: action.bound,
+            clearClosedContractMarkers: action.bound,
         });
 
         this.root_store = root_store;
@@ -471,6 +472,28 @@ export default class ContractTradeStore extends BaseStore {
 
     onUnmount() {
         // TODO: don't forget the tick history when switching to contract-replay-store
+    }
+
+    // Clear markers for closed contracts
+    clearClosedContractMarkers() {
+        if (this.contracts && this.contracts.length > 0) {
+            // Clear markers for all contracts, not just sold ones
+            // This ensures entry spot markers and other persistent markers are also cleared
+            runInAction(() => {
+                this.contracts.forEach(contract => {
+                    if (contract) {
+                        contract.markers_array = [];
+                        contract.marker = null;
+                    }
+                });
+
+                // Force a refresh of the markers array
+                this.last_contract_override = null;
+            });
+        }
+
+        // Reset the accumulator marker data as well
+        this.clearAccumulatorBarriersData(false, true);
     }
 
     // Called from portfolio

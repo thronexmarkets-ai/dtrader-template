@@ -44,7 +44,7 @@ const BottomWidgetsMobile = ({ tick, digits, setTick, setDigits }: TBottomWidget
 };
 
 const Trade = observer(() => {
-    const { client, common, ui } = useStore();
+    const { client, common, ui, contract_trade } = useStore();
     const {
         contract_type,
         form_components,
@@ -103,6 +103,7 @@ const Trade = observer(() => {
         if (has_session_storage && is_logged_in) {
             sessionStorage.removeItem('tradershub_redirect_to');
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     React.useEffect(() => {
@@ -147,6 +148,15 @@ const Trade = observer(() => {
         }
         return () => onUnmount();
     }, [onMount, onUnmount, getFirstOpenMarket, is_synthetics_available]);
+
+    // Clear contract markers when navigating to trade page from reports
+    React.useEffect(() => {
+        // Clear any existing contract markers from closed contracts
+        if (contract_trade && 'clearClosedContractMarkers' in contract_trade) {
+            contract_trade.clearClosedContractMarkers();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     React.useEffect(() => {
         if (isMobile) {

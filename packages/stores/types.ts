@@ -554,6 +554,7 @@ type TContractTradeStore = {
     updateChartType: (type: string) => void;
     updateGranularity: (granularity: number | null) => void;
     updateProposal: (response: ProposalOpenContract) => void;
+    clearClosedContractMarkers: () => void;
 };
 
 type TContractStore = {

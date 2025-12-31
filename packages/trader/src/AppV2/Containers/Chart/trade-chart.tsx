@@ -22,6 +22,8 @@ import { useSmartChartsAdapter } from 'Modules/SmartChart/Hooks/useSmartChartsAd
 import { CHART_CONSTANTS, getMarketsOrder } from 'Modules/SmartChart/Utils/chart-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
 
+import ChartIntroGuide from '_common/components/ChartIntroGuide';
+
 type TickSpotData = NonNullable<TTicksStreamResponse['tick']>;
 
 type TBottomWidgetsParams = {
@@ -86,6 +88,7 @@ const TradeChart = observer(() => {
         prev_contract_type,
     } = useTraderStore();
     const is_accumulator = isAccumulatorContract(contract_type);
+    const timeoutsMapRef = React.useRef<Map<number, NodeJS.Timeout>>(new Map());
     const settings = {
         countdown: is_chart_countdown_visible,
         isHighestLowestMarkerEnabled: false, // TODO: Pending UI,
@@ -150,19 +153,38 @@ const TradeChart = observer(() => {
 
     // Automatically remove closed positions after 8 seconds
     React.useEffect(() => {
-        const timeouts: NodeJS.Timeout[] = [];
+        const timeoutsMap = timeoutsMapRef.current;
+        const currentClosedIds = new Set(closed_positions_ids);
 
+        // Start timers for newly closed positions
         closed_positions_ids.forEach(positionId => {
-            const timeout = setTimeout(() => {
-                onClickRemove(positionId);
-            }, CHART_CONSTANTS.CLOSED_POSITION_REMOVE_TIMEOUT);
-            timeouts.push(timeout);
+            if (!timeoutsMap.has(Number(positionId))) {
+                const timeout = setTimeout(() => {
+                    onClickRemove(positionId);
+                    timeoutsMap.delete(Number(positionId));
+                }, CHART_CONSTANTS.CLOSED_POSITION_REMOVE_TIMEOUT);
+                timeoutsMap.set(Number(positionId), timeout);
+            }
         });
 
+        // Clear timers for positions that are no longer in the closed list
+        timeoutsMap.forEach((timeout, positionId) => {
+            if (!currentClosedIds.has(positionId)) {
+                clearTimeout(timeout);
+                timeoutsMap.delete(positionId);
+            }
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [closed_positions_ids]);
+
+    // Cleanup all timeouts on unmount
+    React.useEffect(() => {
+        const timeoutsMap = timeoutsMapRef.current;
         return () => {
-            timeouts.forEach(timeout => clearTimeout(timeout));
+            timeoutsMap.forEach(timeout => clearTimeout(timeout));
+            timeoutsMap.clear();
         };
-    }, [closed_positions_ids, onClickRemove]);
+    }, []);
 
     if (!symbol || !active_symbols.length) return null;
 

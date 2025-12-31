@@ -36,6 +36,7 @@ const Trade = observer(() => {
         client,
         common: { current_language, network_status },
         ui: { is_dark_mode_on },
+        contract_trade,
     } = useStore();
     const { is_logged_in } = client;
     const { isBridgeAvailable } = useMobileBridge();
@@ -85,11 +86,7 @@ const Trade = observer(() => {
     );
 
     const onTradeTypeSelect = React.useCallback(
-        (
-            e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
-            subform_name: string,
-            trade_type_count: number
-        ) => {
+        (e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
             const selected_trade_type = trade_types.find(
                 ({ text }) => text === (e.target as HTMLButtonElement).textContent
             );
@@ -104,6 +101,7 @@ const Trade = observer(() => {
                 trade_type_name: selected_trade_type?.text || '',
             });
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [trade_types, onChange, symbol]
     );
 
@@ -121,6 +119,15 @@ const Trade = observer(() => {
         return onUnmount;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [current_language, network_status.class]);
+
+    // Clear contract markers when navigating to trade page from reports
+    React.useEffect(() => {
+        // Clear any existing contract markers from closed contracts
+        if (contract_trade && 'clearClosedContractMarkers' in contract_trade) {
+            contract_trade.clearClosedContractMarkers();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <BottomNav onScroll={onScroll}>
