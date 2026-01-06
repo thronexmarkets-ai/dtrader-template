@@ -173,14 +173,8 @@ export default class CommonStore extends BaseStore {
     }
 
     setNetworkStatus(status, is_online) {
-        if (this.network_status.class) {
-            this.network_status.class = status.class;
-            this.network_status.tooltip = status.tooltip;
-        } else {
-            this.network_status = status;
-        }
+        this.network_status = { ...status };
         this.is_network_online = is_online;
-
         const { addNotificationMessage, client_notifications, removeNotificationMessage } =
             this.root_store.notifications;
         if (!is_online) {
