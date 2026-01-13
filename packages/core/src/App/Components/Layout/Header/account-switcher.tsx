@@ -18,6 +18,7 @@ type TAccountSwitcherProps = {
     is_open?: boolean;
     onClose?: () => void;
     onRefetch?: () => void;
+    onAccountSwitch?: () => void;
 };
 
 /**
@@ -25,24 +26,36 @@ type TAccountSwitcherProps = {
  * Handles displaying account list in either ActionSheet (mobile) or dropdown (desktop)
  */
 const AccountSwitcher = observer(
-    ({ accounts, current_loginid, is_loading, error, is_open = true, onClose, onRefetch }: TAccountSwitcherProps) => {
+    ({
+        accounts,
+        current_loginid,
+        is_loading,
+        error,
+        is_open = true,
+        onClose,
+        onRefetch,
+        onAccountSwitch,
+    }: TAccountSwitcherProps) => {
         const { isMobile } = useDevice();
         const { client } = useStore();
 
         const handleAccountClick = (account: TDerivativesAccount) => {
             // Switch account if different from current
             if (account.account_id !== current_loginid) {
+                // Notify parent that account switch is starting (fire-and-forget)
+                onAccountSwitch?.();
+
+                // Note: switchAccount is fire-and-forget - it updates localStorage and reconnects WebSocket
+                // The parent component's loading state will be reset when new data arrives via useDerivativesAccount
                 client.switchAccount(account.account_id, account.account_type);
             }
 
             // Close dropdown/sheet after switching
-            if (onClose) onClose();
+            onClose?.();
         };
 
         const handleRefreshClick = () => {
-            if (onRefetch) {
-                onRefetch();
-            }
+            onRefetch?.();
         };
 
         // Render account list content

@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
 
 import { Text } from '@deriv/components';
 import { LegacyChevronDown1pxIcon } from '@deriv/quill-icons';
@@ -12,7 +13,7 @@ import AccountInfoWrapper from './account-info-wrapper';
 import AccountSwitcher from './account-switcher';
 import AccountSwitcherIntroTooltip from './AccountSwitcherIntroTooltip';
 
-const AccountInfo = observer(({ accounts = [], isLoading = false, error = null, refetch }) => {
+const AccountInfo = observer(({ accounts = [], isLoading = false, error = null, refetch, onAccountSwitch }) => {
     const { localize } = useTranslations();
     const { isMobile } = useDevice();
 
@@ -126,6 +127,7 @@ const AccountInfo = observer(({ accounts = [], isLoading = false, error = null, 
                         is_open={is_dropdown_open}
                         onClose={() => setIsDropdownOpen(false)}
                         onRefetch={refetch}
+                        onAccountSwitch={onAccountSwitch}
                     />
                 )}
             </div>
@@ -139,5 +141,13 @@ const AccountInfo = observer(({ accounts = [], isLoading = false, error = null, 
         </React.Fragment>
     );
 });
+
+AccountInfo.propTypes = {
+    accounts: PropTypes.array,
+    isLoading: PropTypes.bool,
+    error: PropTypes.object,
+    refetch: PropTypes.func,
+    onAccountSwitch: PropTypes.func,
+};
 
 export default AccountInfo;
