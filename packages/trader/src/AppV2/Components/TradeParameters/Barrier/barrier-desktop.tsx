@@ -52,7 +52,7 @@ const BarrierDesktop: React.FC<BarrierDesktopProps> = observer(({ is_minimized }
 
     return (
         <TradeParameterPopover
-            popoverWidth={424}
+            popoverWidth={360}
             label={<Localize i18n_default_text='Barrier' key={`barrier${is_minimized ? '-minimized' : ''}`} />}
             value={barrier_1}
             is_minimized={is_minimized}
