@@ -1,7 +1,6 @@
 import React from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { TPriceProposalResponse, TSocketError } from '@deriv/api';
 import {
     formatMoney,
     getCurrencyDisplayCode,
@@ -238,7 +237,7 @@ const TakeProfitInputDesktop = observer(({ onClose, is_open }: TTakeProfitInputD
                     onChange={onInputChange}
                     onBeforeInput={onBeforeInputChange}
                     placeholder={localize('Amount')}
-                    variant='outline'
+                    variant='fill'
                     inputMode='decimal'
                     maxLength={state.max_length}
                     message={state.fe_error_text || state.error_text || getInputMessage()}

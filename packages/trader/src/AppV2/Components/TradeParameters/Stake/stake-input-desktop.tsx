@@ -9,7 +9,7 @@ import {
     mapErrorMessage,
     trackAnalyticsEvent,
 } from '@deriv/shared';
-import { ActionSheet, TextField, Button } from '@deriv-com/quill-ui';
+import { TextField, Button } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
 import useIsVirtualKeyboardOpen from 'AppV2/Hooks/useIsVirtualKeyboardOpen';
@@ -424,7 +424,7 @@ const StakeInput = observer(({ onClose, is_open }: TStakeInput) => {
                 onChange={onInputChange}
                 onBeforeInput={onBeforeInputChange}
                 placeholder={localize('Amount')}
-                variant='outline'
+                variant='fill'
                 inputMode='decimal'
                 maxLength={state.max_length}
                 message={fe_stake_error || (should_show_stake_error && stake_error) || getInputMessage()}
