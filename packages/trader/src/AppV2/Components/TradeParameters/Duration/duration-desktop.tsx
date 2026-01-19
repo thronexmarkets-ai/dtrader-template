@@ -4,6 +4,7 @@ import { observer } from 'mobx-react-lite';
 import { Text } from '@deriv-com/quill-ui';
 import { Localize, localize } from '@deriv-com/translations';
 
+import { TRADE_PARAMETER_PRESETS } from 'AppV2/Config/trade-parameter-presets';
 import { useTraderStore } from 'Stores/useTraderStores';
 
 import { TabSelector } from '../../InputPopover';
@@ -16,13 +17,6 @@ import DurationHoursInputDesktop from './duration-hours-input-desktop';
 import DurationInputDesktop from './duration-input-desktop';
 import DurationTicksInputDesktop from './duration-ticks-input-desktop';
 import DurationUnitSelector from './duration-unit-selector';
-
-const DURATION_TICK_VALUES = [1, 2, 3, 4, 5, 6, 7, 8];
-const DURATION_SECONDS_VALUES = [1, 20, 25, 30, 40, 50];
-const DURATION_MINUTES_VALUES = [1, 2, 3, 4, 5, 10];
-const DURATION_HOURS_VALUES = [1, 2, 3, 4, 6, 8];
-const DURATION_END_TIME_VALUES = ['07:30', '07:35', '07:40', '07:45', '07:50', '07:55'];
-const DURATION_END_DATE_VALUES = [1, 2, 3, 5, 7, 10]; // Days from now
 
 interface DurationDesktopProps {
     is_minimized?: boolean;
@@ -109,42 +103,42 @@ const DurationPopoverContent: React.FC<{
             } | null
         > = {
             t: {
-                chipValues: DURATION_TICK_VALUES,
+                chipValues: TRADE_PARAMETER_PRESETS.duration.ticks,
                 selectedValue: selectedDuration,
                 onSelect: handleDurationSelectAndClose,
                 formatValue: formatTickValue,
                 inputComponent: <DurationTicksInputDesktop onClose={closePopover} />,
             },
             s: {
-                chipValues: DURATION_SECONDS_VALUES,
+                chipValues: TRADE_PARAMETER_PRESETS.duration.seconds,
                 selectedValue: selectedDuration,
                 onSelect: handleDurationSelectAndClose,
                 formatValue: formatSecondsValue,
                 inputComponent: <DurationInputDesktop unit='s' onClose={closePopover} />,
             },
             m: {
-                chipValues: DURATION_MINUTES_VALUES,
+                chipValues: TRADE_PARAMETER_PRESETS.duration.minutes,
                 selectedValue: selectedDuration,
                 onSelect: handleDurationSelectAndClose,
                 formatValue: formatMinutesValue,
                 inputComponent: <DurationInputDesktop unit='m' onClose={closePopover} />,
             },
             h: {
-                chipValues: DURATION_HOURS_VALUES,
+                chipValues: TRADE_PARAMETER_PRESETS.duration.hours,
                 selectedValue: Math.floor(selectedDuration / 60),
                 onSelect: handleHourSelectAndClose,
                 formatValue: formatHoursValue,
                 inputComponent: <DurationHoursInputDesktop onClose={closePopover} />,
             },
             end_time: {
-                chipValues: DURATION_END_TIME_VALUES,
-                selectedValue: DURATION_END_TIME_VALUES[0],
+                chipValues: TRADE_PARAMETER_PRESETS.duration.endTime,
+                selectedValue: TRADE_PARAMETER_PRESETS.duration.endTime[0],
                 onSelect: handleEndTimeSelectAndClose,
                 formatValue: formatEndTimeValue,
                 inputComponent: <DurationEndTimeDesktop onClose={closePopover} />,
             },
             end_date: {
-                chipValues: DURATION_END_DATE_VALUES,
+                chipValues: TRADE_PARAMETER_PRESETS.duration.endDate,
                 selectedValue: selectedDuration,
                 onSelect: handleEndDateSelectAndClose,
                 formatValue: formatEndDateValue,

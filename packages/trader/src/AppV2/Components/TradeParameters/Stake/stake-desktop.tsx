@@ -10,6 +10,7 @@ import {
     TradeParameterPopover,
     useTradeParameterPopover,
 } from 'AppV2/Components/TradeParameters/Shared';
+import { TRADE_PARAMETER_PRESETS } from 'AppV2/Config/trade-parameter-presets';
 import useTradeError from 'AppV2/Hooks/useTradeError';
 import { getDisplayedContractTypes } from 'AppV2/Utils/trade-types-utils';
 import { useTraderStore } from 'Stores/useTraderStores';
@@ -17,8 +18,6 @@ import { useTraderStore } from 'Stores/useTraderStores';
 import { TTradeParametersProps } from '../trade-parameters';
 
 import StakeInputDesktop from './stake-input-desktop';
-
-const STAKE_CHIP_VALUES = [1, 5, 10, 15, 20, 25];
 
 const StakePopoverContent: React.FC<{
     active_tab: 'chips' | 'input';
@@ -40,7 +39,7 @@ const StakePopoverContent: React.FC<{
     return (
         <ChipsWithInputToggle
             activeTab={active_tab}
-            chipValues={STAKE_CHIP_VALUES}
+            chipValues={TRADE_PARAMETER_PRESETS.stake.desktop}
             selectedValue={amount}
             onSelect={handleChipSelectAndClose}
             formatValue={(val: number) => `${val} ${getCurrencyDisplayCode(currency)}`}

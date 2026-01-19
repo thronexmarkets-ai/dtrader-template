@@ -3,19 +3,19 @@ import clsx from 'clsx';
 
 import { getCurrencyDisplayCode } from '@deriv/shared';
 
+import { TRADE_PARAMETER_PRESETS } from 'AppV2/Config/trade-parameter-presets';
+
 type TStakeChipsProps = {
     currency: string;
     onChipSelect: (amount: number) => void;
     selected_amount?: number;
 };
 
-const CHIP_VALUES = [1, 5, 10, 15, 20, 25, 30, 40, 50, 100];
-
 const StakeChips = ({ currency, onChipSelect, selected_amount }: TStakeChipsProps) => {
     return (
         <div className='stake-chips'>
             <div className='stake-chips__grid'>
-                {CHIP_VALUES.map(value => (
+                {TRADE_PARAMETER_PRESETS.stake.mobile.map(value => (
                     <button
                         key={value}
                         type='button'
