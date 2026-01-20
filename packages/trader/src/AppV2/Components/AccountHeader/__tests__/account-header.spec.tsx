@@ -114,6 +114,10 @@ describe('AccountHeader', () => {
             error: null,
             refetch: jest.fn(),
         });
+
+        // Mock window.location to prevent jsdom navigation errors
+        delete (window as any).location;
+        (window as any).location = { href: '' };
     });
 
     describe('Logged in state', () => {
@@ -794,6 +798,61 @@ describe('AccountHeader', () => {
                 // Should open modal, not send bridge event
                 expect(toggleTryRealModal).toHaveBeenCalledWith(true);
                 expect(mockSendBridgeEvent).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('Account switching loading state', () => {
+            it('should show skeleton loader when isLoading is true', () => {
+                mockUseDerivativesAccount.mockReturnValue({
+                    data: { data: [] },
+                    isLoading: true,
+                    error: null,
+                    refetch: jest.fn(),
+                });
+
+                renderComponent();
+
+                expect(screen.getByTestId('dt_skeleton')).toBeInTheDocument();
+            });
+
+            it('should show skeleton loader with correct inline styles', () => {
+                mockUseDerivativesAccount.mockReturnValue({
+                    data: { data: [] },
+                    isLoading: true,
+                    error: null,
+                    refetch: jest.fn(),
+                });
+
+                renderComponent();
+
+                const skeleton = screen.getByTestId('dt_skeleton');
+                expect(skeleton).toHaveStyle({ width: '240px', height: '44px' });
+            });
+
+            it('should hide skeleton loader when isLoading is false', () => {
+                renderComponent();
+
+                expect(screen.queryByTestId('dt_skeleton')).not.toBeInTheDocument();
+                expect(screen.getByText('Real account')).toBeInTheDocument();
+            });
+
+            it('should not show skeleton loader when data is loaded', () => {
+                mockUseDerivativesAccount.mockReturnValue({
+                    data: {
+                        data: [
+                            { account_id: 'CR123', account_type: 'real', balance: '10000.00', currency: 'USD' },
+                            { account_id: 'VRTC456', account_type: 'demo', balance: '5000.00', currency: 'USD' },
+                        ],
+                    },
+                    isLoading: false,
+                    error: null,
+                    refetch: jest.fn(),
+                });
+
+                renderComponent();
+
+                expect(screen.queryByTestId('dt_skeleton')).not.toBeInTheDocument();
+                expect(screen.getByText('Real account')).toBeInTheDocument();
             });
         });
     });

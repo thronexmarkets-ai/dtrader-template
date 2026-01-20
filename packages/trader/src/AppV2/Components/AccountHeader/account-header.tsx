@@ -45,6 +45,7 @@ const AccountHeader = observer(
         // Dropdown state
         const [is_dropdown_open, setIsDropdownOpen] = React.useState(false);
         const [is_account_switcher_highlighted, setIsAccountSwitcherHighlighted] = React.useState(false);
+        const [is_switching_account, setIsSwitchingAccount] = React.useState(false);
         const dropdown_ref = React.useRef<HTMLDivElement>(null);
         const account_switcher_container_ref = React.useRef<HTMLDivElement>(null);
 
@@ -52,6 +53,18 @@ const AccountHeader = observer(
         const handleAccountSwitcherHighlight = React.useCallback((is_highlighted: boolean) => {
             setIsAccountSwitcherHighlighted(is_highlighted);
         }, []);
+
+        // Handle account switch start
+        const handleAccountSwitchStart = React.useCallback(() => {
+            setIsSwitchingAccount(true);
+        }, []);
+
+        // Reset switching state when data is available
+        React.useEffect(() => {
+            if (!isLoading && data) {
+                setIsSwitchingAccount(false);
+            }
+        }, [isLoading, data]);
 
         // Close dropdown when clicking outside
         React.useEffect(() => {
@@ -166,6 +179,7 @@ const AccountHeader = observer(
                             is_open={is_dropdown_open}
                             onClose={() => setIsDropdownOpen(false)}
                             onRefetch={refetch}
+                            onAccountSwitch={handleAccountSwitchStart}
                         />
                     )}
                 </div>
@@ -203,12 +217,14 @@ const AccountHeader = observer(
             );
         }
 
+        const shouldShowLoader = isLoading || is_switching_account;
+
         return (
             <React.Fragment>
                 <div className='account-header' ref={dropdown_ref}>
-                    {isLoading ? (
+                    {shouldShowLoader ? (
                         <div className='account-header--loading'>
-                            <Skeleton height={48} width={240} />
+                            <Skeleton height={44} width={240} borderRadius={22} />
                         </div>
                     ) : (
                         <React.Fragment>

@@ -3,7 +3,7 @@
     scrollbar-width: none;
 
     @include mobile-screen {
-        height: calc(100% - 6.4rem);
+        height: calc(100% - 5.6rem);
     }
 
     &-container-v2 {
@@ -11,7 +11,6 @@
         flex-direction: column;
         height: 100vh;
         width: calc(100vw - 7.2rem);
-        background-color: var(--semantic-color-slate-solid-surface-frame-mid);
 
         @include mobile-screen {
             height: unset;
@@ -125,6 +124,17 @@
             .smartcharts {
                 position: relative;
             }
+        }
+        &__market-selector-guide {
+            display: flex;
+            justify-content: space-between;
+        }
+        &__guide {
+            height: 3.2rem;
+            width: 3.2rem;
+            border-radius: 1.6rem;
+            padding: unset;
+            background-color: var(--semantic-color-monochrome-surface-normal-lowest);
         }
         &__parameter {
             min-height: 7.2rem;

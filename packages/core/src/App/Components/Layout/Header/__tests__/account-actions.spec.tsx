@@ -321,4 +321,80 @@ describe('AccountActions component', () => {
             expect(mockSendBridgeEvent).not.toHaveBeenCalled();
         });
     });
+
+    describe('Account switching loading state', () => {
+        it('should show skeleton loaders when isLoading is true', () => {
+            mockUseDerivativesAccount.mockReturnValue({
+                data: { data: [] },
+                isLoading: true,
+                error: null,
+                refetch: jest.fn(),
+            });
+
+            renderWithStore();
+
+            const skeletons = screen.getAllByTestId('dt_skeleton');
+            expect(skeletons).toHaveLength(2);
+        });
+
+        it('should reset loading state when query completes', async () => {
+            let currentIsLoading = true;
+            const mockRefetch = jest.fn();
+
+            mockUseDerivativesAccount.mockImplementation(() => ({
+                data: {
+                    data: currentIsLoading
+                        ? []
+                        : [
+                              { account_id: 'CR123', account_type: 'real', balance: '10000.00', currency: 'USD' },
+                              { account_id: 'VRTC456', account_type: 'demo', balance: '5000.00', currency: 'USD' },
+                          ],
+                },
+                isLoading: currentIsLoading,
+                error: null,
+                refetch: mockRefetch,
+            }));
+
+            const { rerender } = renderWithStore();
+
+            expect(screen.getAllByTestId('dt_skeleton')).toHaveLength(2);
+
+            currentIsLoading = false;
+            mockUseDerivativesAccount.mockReturnValue({
+                data: {
+                    data: [
+                        { account_id: 'CR123', account_type: 'real', balance: '10000.00', currency: 'USD' },
+                        { account_id: 'VRTC456', account_type: 'demo', balance: '5000.00', currency: 'USD' },
+                    ],
+                },
+                isLoading: false,
+                error: null,
+                refetch: mockRefetch,
+            });
+
+            rerender(
+                <StoreProvider store={mockStore(default_mock_store)}>
+                    <AccountActions />
+                </StoreProvider>
+            );
+
+            await screen.findByTestId('dt_account_info');
+            expect(screen.queryByTestId('dt_skeleton')).not.toBeInTheDocument();
+        });
+
+        it('should render skeleton loaders with correct inline styles', () => {
+            mockUseDerivativesAccount.mockReturnValue({
+                data: { data: [] },
+                isLoading: true,
+                error: null,
+                refetch: jest.fn(),
+            });
+
+            renderWithStore();
+
+            const skeletons = screen.getAllByTestId('dt_skeleton');
+            expect(skeletons[0]).toHaveStyle({ width: '120px', height: '32px' });
+            expect(skeletons[1]).toHaveStyle({ width: '80px', height: '32px' });
+        });
+    });
 });

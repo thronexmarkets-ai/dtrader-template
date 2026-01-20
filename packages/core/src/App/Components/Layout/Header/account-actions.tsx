@@ -30,6 +30,18 @@ const AccountActionsComponent = observer(() => {
     const { data, isLoading, error, refetch } = useDerivativesAccount(loginid, is_logged_in);
     const accounts = data?.data || [];
 
+    const [is_switching_account, setIsSwitchingAccount] = React.useState(false);
+
+    const handleAccountSwitchStart = React.useCallback(() => {
+        setIsSwitchingAccount(true);
+    }, []);
+
+    React.useEffect(() => {
+        if (!isLoading && accounts.length > 0) {
+            setIsSwitchingAccount(false);
+        }
+    }, [isLoading, accounts]);
+
     // Determine account types available
     const hasOnlyDemoAccounts = accounts.length > 0 && accounts.every(acc => acc.account_type === 'demo');
 
@@ -63,7 +75,13 @@ const AccountActionsComponent = observer(() => {
 
     const renderAccountInfo = () => (
         <React.Suspense fallback={<div />}>
-            <AccountInfo accounts={accounts} isLoading={isLoading} error={error} refetch={refetch} />
+            <AccountInfo
+                accounts={accounts}
+                isLoading={isLoading}
+                error={error}
+                refetch={refetch}
+                onAccountSwitch={handleAccountSwitchStart}
+            />
             <Button
                 className='acc-info__transfer-button'
                 onClick={handleTransferClick}
@@ -91,17 +109,19 @@ const AccountActionsComponent = observer(() => {
         );
     }
 
+    const shouldShowLoader = isLoading || is_switching_account;
+
     return (
         <div
             id='dt_core_header_acc-info-container'
             className={classNames('acc-info__container', {
-                'acc-info__container--loading': isLoading,
+                'acc-info__container--loading': shouldShowLoader,
             })}
         >
-            {isLoading ? (
+            {shouldShowLoader ? (
                 <React.Fragment>
-                    <Skeleton height={32} width={120} />
-                    <Skeleton height={32} width={80} />
+                    <Skeleton height={32} width={120} borderRadius={16} />
+                    <Skeleton height={32} width={80} borderRadius={16} />
                 </React.Fragment>
             ) : (
                 renderAccountInfo()

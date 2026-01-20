@@ -72,9 +72,8 @@
         overflow-x: hidden;
 
         @include mobile-screen {
-            padding: 0 var(--core-spacing-400);
+            padding: var(--core-spacing-400);
             gap: var(--semantic-spacing-general-sm);
-            background-color: var(--semantic-color-slate-solid-surface-frame-mid);
         }
 
         .skeleton-box {
@@ -88,19 +87,17 @@
                 background-color: var(--component-modal-bg);
             }
 
-            &__trade-types {
-                position: relative;
+            &__header {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
+                justify-content: space-between;
                 flex-wrap: nowrap;
-                inset-inline-start: calc(-1 * var(--semantic-spacing-general-sm));
-                width: 100vw;
+                width: 100%;
                 height: 6.5rem;
                 border-radius: unset;
                 border-bottom: 1px solid var(--semantic-color-monochrome-border-normal-mid);
                 padding: var(--semantic-spacing-general-sm) var(--semantic-spacing-general-md);
-                gap: var(--semantic-spacing-general-sm);
 
                 .skeleton {
                     flex-shrink: 0;
@@ -109,13 +106,27 @@
                 @include mobile-screen {
                     height: unset;
                     border-bottom: none;
+                    padding: unset;
                 }
+
+                &-trade-types {
+                    display: flex;
+                    gap: var(--core-spacing-400);
+                }
+            }
+            &__trade-types {
+                display: flex;
+                gap: var(--core-spacing-400);
             }
             &__market {
                 display: flex;
                 flex-direction: column;
                 padding: 0 var(--semantic-spacing-general-sm);
                 background-color: unset;
+
+                @include mobile-screen {
+                    padding: unset;
+                }
             }
             &__trade-params {
                 display: flex;
@@ -126,6 +137,7 @@
 
                 @include mobile-screen {
                     width: unset;
+                    padding: unset;
                 }
 
                 &-row {
@@ -148,6 +160,7 @@
 
                 @include mobile-screen {
                     width: unset;
+                    padding: unset;
                 }
             }
         }

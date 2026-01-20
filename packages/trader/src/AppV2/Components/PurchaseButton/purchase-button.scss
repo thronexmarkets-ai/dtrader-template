@@ -53,8 +53,7 @@
         border-radius: 100px;
 
         @include mobile-screen {
-            position: fixed;
-            padding: 0 var(--core-spacing-400) var(--core-spacing-400);
+            padding: var(--core-spacing-400) 0;
         }
 
         &__un-auth {
@@ -78,7 +77,7 @@
         }
 
         .quill-button {
-            border-radius: 100px;
+            border-radius: 28px;
         }
     }
 }

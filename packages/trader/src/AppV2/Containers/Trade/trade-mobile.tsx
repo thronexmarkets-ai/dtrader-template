@@ -2,21 +2,21 @@ import React from 'react';
 import clsx from 'clsx';
 import { observer } from 'mobx-react-lite';
 
+import { useLocalStorageData } from '@deriv/api';
 import { Loading } from '@deriv/components';
-import { useLocalStorageData, useMobileBridge } from '@deriv/api';
 import { getSymbolDisplayName, trackAnalyticsEvent } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 
 import AccumulatorStats from 'AppV2/Components/AccumulatorStats';
 import CurrentSpot from 'AppV2/Components/CurrentSpot';
+import Guide from 'AppV2/Components/Guide';
 import MarketSelector from 'AppV2/Components/MarketSelector';
 import OnboardingGuide from 'AppV2/Components/OnboardingGuide/GuideForPages';
-import PurchaseButton from 'AppV2/Components/PurchaseButton';
 import TradeErrorSnackbar from 'AppV2/Components/TradeErrorSnackbar';
-import { TradeParameters, TradeParametersContainer } from 'AppV2/Components/TradeParameters';
+import { TradeParametersContainer } from 'AppV2/Components/TradeParameters';
 import useContractsFor from 'AppV2/Hooks/useContractsFor';
 import useDefaultSymbol from 'AppV2/Hooks/useDefaultSymbol';
-import { getChartHeight, HEIGHT } from 'AppV2/Utils/layout-utils';
+import { getChartHeight } from 'AppV2/Utils/layout-utils';
 import { getDisplayedContractTypes } from 'AppV2/Utils/trade-types-utils';
 import { isDigitTradeType } from 'Modules/Trading/Helpers/digits';
 import { useTraderStore } from 'Stores/useTraderStores';
@@ -26,7 +26,6 @@ import { TradeChart } from '../Chart';
 import TradeTypes from './trade-types';
 
 const Trade = observer(() => {
-    const [is_minimized_params_visible, setIsMinimizedParamsVisible] = React.useState(false);
     const chart_ref = React.useRef<HTMLDivElement>(null);
     const {
         client,
@@ -34,7 +33,6 @@ const Trade = observer(() => {
         ui: { is_dark_mode_on },
         contract_trade,
     } = useStore();
-    const { isBridgeAvailable } = useMobileBridge();
     const { is_logged_in } = client;
     const {
         active_symbols,
@@ -97,17 +95,9 @@ const Trade = observer(() => {
                 trade_type_name: selected_trade_type?.text || '',
             });
         },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [trade_types, onChange, symbol]
     );
-
-    const onScroll = React.useCallback(() => {
-        const current_chart_ref = chart_ref?.current;
-        if (current_chart_ref) {
-            const chart_bottom_Y = current_chart_ref.getBoundingClientRect().bottom;
-            const container_bottom_Y = window.innerHeight - HEIGHT.BOTTOM_NAV;
-            setIsMinimizedParamsVisible(chart_bottom_Y <= container_bottom_Y);
-        }
-    }, []);
 
     React.useEffect(() => {
         onMount();
@@ -125,32 +115,34 @@ const Trade = observer(() => {
     }, []);
 
     return (
-        <div className='trade' onScroll={onScroll} data-testid='dt_trade-mobile'>
+        <div className='trade' data-testid='dt_trade-mobile'>
             {symbols.length && trade_types.length ? (
                 <React.Fragment>
-                    <div
-                        className={clsx('trade-container-v2', {
-                            'trade-container-v2__logout': !is_logged_in,
-                        })}
-                    >
+                    <div className='trade-container-v2'>
                         <TradeTypes
                             contract_type={contract_type}
                             onTradeTypeSelect={onTradeTypeSelect}
                             trade_types={trade_types}
                             is_dark_mode_on={is_dark_mode_on}
                         />
-                        <MarketSelector />
+                        <div className='trade-container-v2__market-selector-guide'>
+                            <MarketSelector />
+                            <Guide show_guide_for_selected_contract />
+                        </div>
                         {isDigitTradeType(contract_type) && <CurrentSpot />}
-                        <TradeParametersContainer>
-                            <TradeParameters />
-                        </TradeParametersContainer>
                         <div className='trade-container-v2__chart-tooltip'>
                             <section
                                 className={clsx('trade-container-v2__chart', {
-                                    'trade-containe-v2__chart--with-borderRadius': !is_accumulator,
+                                    'trade-container-v2__chart--with-borderRadius': !is_accumulator,
                                 })}
                                 style={{
-                                    height: getChartHeight({ is_accumulator, symbol, has_cancellation, contract_type }),
+                                    height: getChartHeight({
+                                        is_accumulator,
+                                        symbol,
+                                        has_cancellation,
+                                        contract_type,
+                                        is_logged_in,
+                                    }),
                                 }}
                                 ref={chart_ref}
                             >
@@ -159,18 +151,8 @@ const Trade = observer(() => {
                         </div>
                         {is_accumulator && <AccumulatorStats />}
                     </div>
-                    <div
-                        className={clsx('trade-container-v2__parameter', {
-                            'trade-container-v2__parameter--with-button': !is_market_closed,
-                        })}
-                    >
-                        <TradeParametersContainer is_minimized_visible={is_minimized_params_visible} is_minimized>
-                            <TradeParameters is_minimized />
-                        </TradeParametersContainer>
-                        {!is_market_closed && <PurchaseButton />}
-                    </div>
-                    {/* TODO: Remove isBridgeAvailable check when onboarding video with Accumulators is available*/}
-                    {!guide_dtrader_v2?.trade_page && is_logged_in && !isBridgeAvailable && (
+                    <TradeParametersContainer is_market_closed={is_market_closed} is_logged_in={is_logged_in} />
+                    {!guide_dtrader_v2?.trade_page && is_logged_in && (
                         <OnboardingGuide type='trade_page' is_dark_mode_on={is_dark_mode_on} />
                     )}
                 </React.Fragment>

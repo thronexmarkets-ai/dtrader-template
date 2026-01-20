@@ -1,11 +1,13 @@
 import React from 'react';
 
-import { LabelPairedChevronRightSmRegularIcon, LabelPairedPresentationScreenSmRegularIcon } from '@deriv/quill-icons';
+import { LabelPairedChevronRightSmRegularIcon } from '@deriv/quill-icons';
 import { trackAnalyticsEvent } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { Button, Text } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
+
+import ImageGuide from 'Assets/SvgComponents/trade_explanations/img-guide.svg';
 
 import useAvailableContracts from 'AppV2/Hooks/useAvailableContracts';
 import useGuideContractTypes from 'AppV2/Hooks/useGuideContractTypes';
@@ -18,7 +20,6 @@ import GuideDescriptionModal from './guide-description-modal';
 import './guide.scss';
 
 type TGuide = {
-    has_label?: boolean;
     is_open_by_default?: boolean;
     show_guide_for_selected_contract?: boolean;
     show_trigger_button?: boolean;
@@ -27,7 +28,6 @@ type TGuide = {
 
 const Guide = observer(
     ({
-        has_label,
         is_open_by_default,
         show_guide_for_selected_contract,
         show_trigger_button = true,
@@ -86,7 +86,7 @@ const Guide = observer(
                     (isMobile ? (
                         <Button
                             color={is_dark_mode_on ? 'white' : 'black'}
-                            icon={<LabelPairedPresentationScreenSmRegularIcon key='guide-button-icon' />}
+                            className='trade-container-v2__guide'
                             onClick={() => {
                                 trackAnalyticsEvent('ce_trade_types_form_v2', {
                                     action: 'info_open',
@@ -94,14 +94,10 @@ const Guide = observer(
                                 });
                                 setIsDescriptionOpened(true);
                             }}
-                            variant={has_label ? 'secondary' : 'tertiary'}
+                            variant='tertiary'
                             key={current_language}
                         >
-                            {has_label && (
-                                <Text size='sm' bold color='quill-typography__color--prominent'>
-                                    <Localize i18n_default_text='Guide' />
-                                </Text>
-                            )}
+                            <ImageGuide />
                         </Button>
                     ) : (
                         <div

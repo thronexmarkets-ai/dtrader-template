@@ -160,7 +160,7 @@ describe('Guide', () => {
         });
     });
     const renderGuide = (
-        mockProps: React.ComponentProps<typeof Guide> = { has_label: true, show_guide_for_selected_contract: false }
+        mockProps: React.ComponentProps<typeof Guide> = { show_guide_for_selected_contract: false }
     ) => {
         render(
             <StoreProvider store={default_mock_store}>
@@ -175,7 +175,7 @@ describe('Guide', () => {
         jest.clearAllMocks();
     });
 
-    it('should render component with label and if user clicks on it, should show available contract information', async () => {
+    it('should render component with icon button and if user clicks on it, should show available contract information', async () => {
         renderGuide();
 
         expect(screen.getByText(/How to trade Rise\/Fall\?/)).toBeInTheDocument();
