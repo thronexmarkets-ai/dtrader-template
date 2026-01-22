@@ -45,6 +45,7 @@ const VideoPreview = ({ contract_type, toggleVideoPlayer, video_src }: TVideoPre
                             src={video_src}
                             width={isDesktop ? '448px' : '112px'}
                             height={isDesktop ? '252px' : '73px'}
+                            autoplay
                         />
                         <div className='guide-video__preview__icon__wrapper'>
                             <LabelPairedPlayMdFillIcon className='guide-video__preview__icon' />
@@ -69,7 +70,7 @@ const VideoPreview = ({ contract_type, toggleVideoPlayer, video_src }: TVideoPre
                     <Stream
                         className='guide-video'
                         letterboxColor='transparent'
-                        muted={false}
+                        muted
                         preload='auto'
                         responsive={false}
                         src={video_src}

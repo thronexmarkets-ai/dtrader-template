@@ -69,14 +69,14 @@
                 top: 50%;
                 left: 53%;
                 transform: translate(-50%, -53%);
-                fill: var(--component-textIcon-normal-prominent);
+                fill: var(--semantic-color-slate-solid-surface-normal-lowest);
 
                 &__wrapper {
                     position: absolute;
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
-                    background-color: var(--semantic-color-slate-solid-surface-normal-lowest);
+                    background-color: var(--component-textIcon-normal-prominent);
                     border-radius: 50%;
                     width: 8.8rem;
                     height: 8.8rem;
@@ -114,8 +114,8 @@
 
         &__wrapper {
             border-top: var(--core-spacing-75) solid var(--semantic-color-monochrome-surface-normal-low);
-            padding-block-start: var(--component-actionSheet-spacing-padding-md);
-            margin-block-start: var(--component-actionSheet-spacing-padding-sm);
+            padding-block-start: var(--component-actionSheet-spacing-padding-lg);
+            margin-block-start: var(--component-actionSheet-spacing-padding-lg);
             display: flex;
             align-items: center;
             gap: var(--component-actionSheet-spacing-padding-sm);
