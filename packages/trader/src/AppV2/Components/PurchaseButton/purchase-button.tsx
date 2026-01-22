@@ -41,6 +41,8 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
         has_error: false,
         message: null,
     });
+    const purchaseButtonRef = React.useRef(null);
+    const sellButtonRef = React.useRef(null);
     const { isMobile } = useDevice();
     const { addBanner } = useNotifications();
     const { addSnackbar } = useSnackbar();
@@ -220,6 +222,7 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
                 </div>
             ) : (
                 <div
+                    ref={purchaseButtonRef}
                     className={clsx('purchase-button__wrapper', {
                         'purchase-button__wrapper__un-auth': !is_logged_in,
                     })}

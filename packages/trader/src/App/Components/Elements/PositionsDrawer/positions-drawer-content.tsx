@@ -49,6 +49,8 @@ const PositionsDrawerCardItem = ({
 }: TPositionDrawerCardItem) => {
     const { in_prop } = useNewRowTransition(is_new_row ?? false);
     const onClickRemoveRef = React.useRef(onClickRemove);
+    const nodeRef = React.useRef(null);
+
     React.useEffect(() => {
         onClickRemoveRef.current = onClickRemove;
     }, [onClickRemove]);
@@ -96,8 +98,9 @@ const PositionsDrawerCardItem = ({
             }}
             onEntered={measure}
             unmountOnExit
+            nodeRef={nodeRef}
         >
-            <div className='dc-contract-card__wrapper'>
+            <div ref={nodeRef} className='dc-contract-card__wrapper'>
                 <PositionsDrawerCard
                     {...portfolio_position}
                     {...props}
