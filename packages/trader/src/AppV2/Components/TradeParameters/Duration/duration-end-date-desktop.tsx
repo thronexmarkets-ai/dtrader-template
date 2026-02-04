@@ -1,11 +1,13 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 
+import { toMoment, useIsMounted } from '@deriv/shared';
 import { Button, DatePicker, TextField } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
 import { InputPopover } from 'AppV2/Components/InputPopover';
+import { ContractType } from 'Stores/Modules/Trading/Helpers/contract-type';
 import { useTraderStore } from 'Stores/useTraderStores';
 
 import './duration-end-date-desktop.scss';
@@ -16,7 +18,8 @@ interface DurationEndDateDesktopProps {
 
 const DurationEndDateDesktop: React.FC<DurationEndDateDesktopProps> = observer(({ onClose }) => {
     const { localize } = useTranslations();
-    const { expiry_date, duration_unit, duration, duration_min_max, onChangeMultiple } = useTraderStore();
+    const { expiry_date, duration_unit, duration, duration_min_max, symbol, onChangeMultiple } = useTraderStore();
+    const isMounted = useIsMounted();
 
     // Calculate initial date based on duration_unit and duration
     const getInitialDate = () => {
@@ -34,7 +37,48 @@ const DurationEndDateDesktop: React.FC<DurationEndDateDesktopProps> = observer((
 
     const [selectedDate, setSelectedDate] = useState<Date>(getInitialDate());
     const [isPickerOpen, setIsPickerOpen] = useState(false);
+    const [disabled_days, setDisabledDays] = useState<number[]>([]);
     const field_ref = useRef<HTMLDivElement>(null);
+
+    const onChangeCalendarMonth = useCallback(
+        async (e = toMoment().format('YYYY-MM-DD')) => {
+            let new_disabled_days: number[] = [];
+
+            const trading_days = await ContractType.getTradingDays(e, symbol);
+
+            if (trading_days) {
+                const all_days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+                new_disabled_days = all_days
+                    .map((day: (typeof all_days)[number], index) => (!trading_days.includes(day) ? index : -1))
+                    .filter(index => index !== -1);
+            }
+
+            if (isMounted()) {
+                setDisabledDays(new_disabled_days);
+            }
+        },
+        [isMounted, symbol]
+    );
+
+    useEffect(() => {
+        onChangeCalendarMonth();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // Sync selectedDate with expiry_date when it changes (e.g., when modal reopens after save)
+    useEffect(() => {
+        if (expiry_date) {
+            setSelectedDate(moment(expiry_date).toDate());
+        }
+    }, [expiry_date]);
+
+    const getDisabledDays = useCallback(
+        ({ date }: { date: Date }) => {
+            const day = date.getDay();
+            return disabled_days.includes(day);
+        },
+        [disabled_days]
+    );
 
     const handleDateClick = useCallback(() => {
         setIsPickerOpen(true);
@@ -118,6 +162,7 @@ const DurationEndDateDesktop: React.FC<DurationEndDateDesktopProps> = observer((
                         view='month'
                         value={selectedDate}
                         onChange={handleDateChange}
+                        tileDisabled={getDisabledDays}
                     />
                     <div className='duration-input-desktop__footer'>
                         <Button
