@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
+import { getDurationMinMaxValues } from '@deriv/shared';
 import { Button, TextField } from '@deriv-com/quill-ui';
 import { Localize, useTranslations } from '@deriv-com/translations';
 
@@ -11,17 +12,22 @@ type TDurationInputDesktopProps = {
     onClose: () => void;
 };
 
-const MIN_SECONDS = 15;
-const MAX_SECONDS = 60;
-const MIN_MINUTES = 1;
-const MAX_MINUTES = 60;
+const FALLBACK_MIN_SECONDS = 15;
+const FALLBACK_MIN_MINUTES = 1;
+const MAX_VALUE = 60;
 
 const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ unit, onClose }) => {
     const { localize } = useTranslations();
-    const { duration, duration_unit, onChangeMultiple } = useTraderStore();
+    const { duration, duration_unit, onChangeMultiple, duration_min_max, contract_expiry_type } = useTraderStore();
 
     const [inputValue, setInputValue] = useState<string>(duration_unit === unit ? String(duration) : '');
     const [error, setError] = useState<string>('');
+
+    // Get dynamic min from backend, fallback to hardcoded values if unavailable
+    const [backendMin] = getDurationMinMaxValues(duration_min_max, contract_expiry_type, unit);
+    const min = backendMin ?? (unit === 's' ? FALLBACK_MIN_SECONDS : FALLBACK_MIN_MINUTES);
+    const max = MAX_VALUE;
+    const unitLabel = unit === 's' ? 'seconds' : 'minutes';
 
     const validateInput = useCallback(
         (value: string): boolean => {
@@ -35,10 +41,6 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ u
                 setError(localize('Should be a valid number.'));
                 return false;
             }
-
-            const min = unit === 's' ? MIN_SECONDS : MIN_MINUTES;
-            const max = unit === 's' ? MAX_SECONDS : MAX_MINUTES;
-            const unitLabel = unit === 's' ? 'seconds' : 'minutes';
 
             if (numValue < min || numValue > max) {
                 setError(
@@ -54,7 +56,7 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ u
             setError('');
             return true;
         },
-        [localize, unit]
+        [localize, min, max, unitLabel]
     );
 
     const handleInputChange = useCallback(
@@ -99,10 +101,6 @@ const DurationInputDesktop: React.FC<TDurationInputDesktopProps> = observer(({ u
     };
 
     const getRangeMessage = () => {
-        const min = unit === 's' ? MIN_SECONDS : MIN_MINUTES;
-        const max = unit === 's' ? MAX_SECONDS : MAX_MINUTES;
-        const unitLabel = unit === 's' ? 'seconds' : 'minutes';
-
         return (
             <Localize
                 i18n_default_text='Range: {{min}} - {{max}} {{unit}}'
