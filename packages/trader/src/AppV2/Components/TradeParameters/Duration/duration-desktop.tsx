@@ -42,6 +42,7 @@ type DurationConfig = {
 
 const DurationPopoverContent: React.FC<{
     selectedUnit: string;
+    storedUnit: string; // The unit that the duration was originally stored in
     activeTab: 'chips' | 'input';
     selectedDuration: number;
     availableUnits: string[];
@@ -60,6 +61,7 @@ const DurationPopoverContent: React.FC<{
     formatEndTimeValue: (value: string) => string;
 }> = ({
     selectedUnit,
+    storedUnit,
     activeTab,
     selectedDuration,
     availableUnits,
@@ -136,38 +138,40 @@ const DurationPopoverContent: React.FC<{
         const minutePresets = tradeTypeKey ? getDurationPresets(tradeTypeKey, marketCategory, 'm') : undefined;
         const hourPresets = tradeTypeKey ? getDurationPresets(tradeTypeKey, marketCategory, 'h') : undefined;
 
+        // Only highlight chips for the tab that matches the stored unit
+        // This prevents highlighting "10 hours" when "10 minutes" was selected
         const configs: Record<string, DurationConfig | null> = {
             t: {
                 chipValues: tickPresets || fallbackTicks,
-                selectedValue: selectedDuration,
+                selectedValue: storedUnit === 't' ? selectedDuration : -1,
                 onSelect: handleDurationSelectAndClose as (value: number | string) => void,
                 formatValue: formatTickValue as (value: number | string) => string,
                 inputComponent: <DurationTicksInputDesktop onClose={closePopover} />,
             },
             s: {
                 chipValues: secondPresets || fallbackSeconds,
-                selectedValue: selectedDuration,
+                selectedValue: storedUnit === 's' ? selectedDuration : -1,
                 onSelect: handleDurationSelectAndClose as (value: number | string) => void,
                 formatValue: formatSecondsValue as (value: number | string) => string,
                 inputComponent: <DurationInputDesktop unit='s' onClose={closePopover} />,
             },
             m: {
                 chipValues: minutePresets || fallbackMinutes,
-                selectedValue: selectedDuration,
+                selectedValue: storedUnit === 'm' ? selectedDuration : -1,
                 onSelect: handleDurationSelectAndClose as (value: number | string) => void,
                 formatValue: formatMinutesValue as (value: number | string) => string,
                 inputComponent: <DurationInputDesktop unit='m' onClose={closePopover} />,
             },
             h: {
                 chipValues: hourPresets || fallbackHours,
-                selectedValue: Math.floor(selectedDuration / 60),
+                selectedValue: storedUnit === 'h' ? Math.floor(selectedDuration / 60) : -1,
                 onSelect: handleHourSelectAndClose as (value: number | string) => void,
                 formatValue: formatHoursValue as (value: number | string) => string,
                 inputComponent: <DurationHoursInputDesktop onClose={closePopover} />,
             },
             end_time: {
                 chipValues: defaultEndTimeChips,
-                selectedValue: defaultEndTimeChips[0],
+                selectedValue: storedUnit === 'end_time' ? defaultEndTimeChips[0] : '',
                 onSelect: handleEndTimeSelectAndClose as (value: number | string) => void,
                 formatValue: formatEndTimeValue as (value: number | string) => string,
                 inputComponent: <DurationEndTimeDesktop onClose={closePopover} />,
@@ -176,6 +180,7 @@ const DurationPopoverContent: React.FC<{
         return configs[selectedUnit] || null;
     }, [
         selectedUnit,
+        storedUnit,
         selectedDuration,
         contract_type,
         symbol,
@@ -376,6 +381,25 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
         setActiveTab('chips'); // Reset to chips tab on close
     }, []);
 
+    // Compute the "stored unit" - the unit that the duration was originally stored in
+    // This is used to only highlight chips for the correct unit
+    const storedUnit = React.useMemo(() => {
+        // Priority 1: If expiry_type is 'endtime', stored unit is end_time
+        if (expiry_type === 'endtime') {
+            return 'end_time';
+        }
+        // Priority 2: 'd' (days) maps to end_time
+        if (duration_unit === 'd') {
+            return 'end_time';
+        }
+        // Priority 3: Detect if duration represents hours (stored as minutes >= 60)
+        if (duration_unit === 'm' && duration >= 60 && availableUnits.includes('h')) {
+            return 'h';
+        }
+        // Priority 4: Use the actual duration_unit
+        return duration_unit;
+    }, [expiry_type, duration_unit, duration, availableUnits]);
+
     const handleUnitSelect = useCallback(
         (unit: string) => {
             // Validate that the selected unit has a valid config
@@ -547,6 +571,7 @@ const DurationDesktop: React.FC<DurationDesktopProps> = observer(({ is_minimized
         >
             <DurationPopoverContent
                 selectedUnit={selectedUnit}
+                storedUnit={storedUnit}
                 activeTab={activeTab}
                 selectedDuration={selectedDuration}
                 availableUnits={availableUnits}
