@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import moment from 'moment';
 
+import { trackAnalyticsEvent } from '@deriv/shared';
 import { Text } from '@deriv-com/quill-ui';
 import { Localize, localize } from '@deriv-com/translations';
 
@@ -96,6 +97,12 @@ const DurationPopoverContent: React.FC<{
     const handleDurationSelectAndClose = useCallback(
         (value: number) => {
             onDurationSelect(value);
+            trackAnalyticsEvent('ce_trade_types_form_v2', {
+                action: 'customizing_trades',
+                input_method: 'preset',
+                parameter_type: 'duration',
+                preset_value: value,
+            });
             closePopover();
         },
         [onDurationSelect, closePopover]
@@ -104,6 +111,12 @@ const DurationPopoverContent: React.FC<{
     const handleHourSelectAndClose = useCallback(
         (hours: number) => {
             onHourSelect(hours);
+            trackAnalyticsEvent('ce_trade_types_form_v2', {
+                action: 'customizing_trades',
+                input_method: 'preset',
+                parameter_type: 'duration',
+                preset_value: hours,
+            });
             closePopover();
         },
         [onHourSelect, closePopover]
@@ -112,6 +125,12 @@ const DurationPopoverContent: React.FC<{
     const handleEndTimeSelectAndClose = useCallback(
         (time: string) => {
             onEndTimeSelect(time);
+            trackAnalyticsEvent('ce_trade_types_form_v2', {
+                action: 'customizing_trades',
+                input_method: 'preset',
+                parameter_type: 'duration',
+                preset_value: time,
+            });
             closePopover();
         },
         [onEndTimeSelect, closePopover]

@@ -410,6 +410,8 @@ const StakeInput = observer(({ onClose, is_open }: TStakeInput) => {
         onChange({ target: { name: 'amount', value: proposal_request_values.amount } });
         trackAnalyticsEvent('ce_trade_types_form_v2', {
             action: 'customizing_trades',
+            input_method: 'custom',
+            parameter_type: 'stake',
         });
         onClose();
     };

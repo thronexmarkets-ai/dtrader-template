@@ -31,7 +31,8 @@ type TTradeTypesProps = {
     onTradeTypeSelect: (
         e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
         subform_name: string,
-        trade_type_count: number
+        trade_type_count: number,
+        tab?: 'all' | 'most_traded'
     ) => void;
     trade_types: ReturnType<typeof getTradeTypesList>;
     contract_type: string;
@@ -293,15 +294,21 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
                     trade_types.some(tt => contract.for.includes(tt.value))
                 )}
                 selected_trade_type={contract_type}
-                onTradeTypeSelect={(type: string) => {
+                onTradeTypeSelect={(type: string, tab: 'all' | 'most_traded') => {
                     const trade_type_text = trade_types.find(tt => tt.value === type)?.text || type;
                     const synthetic_event = {
                         target: { textContent: trade_type_text },
                         currentTarget: { textContent: trade_type_text },
                     } as unknown as React.MouseEvent<HTMLElement>;
-                    onTradeTypeSelect(synthetic_event, 'trade_types_selector', getPinnedItems().length);
+                    onTradeTypeSelect(synthetic_event, 'trade_types_selector', getPinnedItems().length, tab);
                 }}
                 onGuideClick={() => {
+                    const selected = trade_types.find(({ value }) => value === contract_type);
+                    trackAnalyticsEvent('ce_trade_types_form_v2', {
+                        action: 'info_open',
+                        trade_type_name: selected?.text || contract_type,
+                        source: 'trade_types_menu',
+                    });
                     setIsGuideOpen(true);
                     setGuideKey(prev => prev + 1);
                 }}
@@ -369,6 +376,7 @@ const TradeTypes = ({ contract_type, onTradeTypeSelect, trade_types, is_dark_mod
                                 trackAnalyticsEvent('ce_trade_types_form_v2', {
                                     action: 'info_open',
                                     trade_type_name: selected_trade_type?.text || contract_type,
+                                    source: 'trade_types_list',
                                 });
                             }}
                         />

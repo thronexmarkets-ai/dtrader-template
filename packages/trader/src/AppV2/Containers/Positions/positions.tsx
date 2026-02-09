@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
 import { useLocalStorageData, useMobileBridge } from '@deriv/api';
-import { getPositionsV2TabIndexFromURL, routes } from '@deriv/shared';
+import { getPositionsV2TabIndexFromURL, routes, trackAnalyticsEvent } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { Tab } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
@@ -15,6 +15,7 @@ import { useModulesStore } from 'Stores/useModulesStores';
 import PositionsContent from './positions-content';
 
 const Positions = observer(() => {
+    const analyticsCalledRef = React.useRef(false);
     const [hasButtonsDemo, setHasButtonsDemo] = React.useState(false);
     const [activeTab, setActiveTab] = React.useState(getPositionsV2TabIndexFromURL());
     const [guide_dtrader_v2] = useLocalStorageData<Record<string, boolean>>('guide_dtrader_v2', {
@@ -50,6 +51,15 @@ const Positions = observer(() => {
         setActiveTab(new_active_tab);
         setPositionURLParams(tabs[new_active_tab].id);
     };
+
+    React.useEffect(() => {
+        if (analyticsCalledRef.current) return;
+        analyticsCalledRef.current = true;
+        trackAnalyticsEvent('ce_reports_form_v2', {
+            action: 'open',
+            platform: 'DTrader',
+        });
+    }, []);
 
     React.useEffect(() => {
         setPositionURLParams(tabs[activeTab].id);

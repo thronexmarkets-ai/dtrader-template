@@ -294,6 +294,8 @@ const TakeProfitStopLossDesktop = observer(({ onClose, is_open }: TTakeProfitSto
 
         trackAnalyticsEvent('ce_trade_types_form_v2', {
             action: 'customizing_trades',
+            input_method: 'custom',
+            parameter_type: 'take_profit_stop_loss',
         });
         onClose();
     };

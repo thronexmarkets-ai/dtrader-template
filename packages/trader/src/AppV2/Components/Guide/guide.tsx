@@ -7,11 +7,10 @@ import { Button, Text } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 
-import ImageGuide from 'Assets/SvgComponents/trade_explanations/img-guide.svg';
-
 import useAvailableContracts from 'AppV2/Hooks/useAvailableContracts';
 import useGuideContractTypes from 'AppV2/Hooks/useGuideContractTypes';
 import { CONTRACT_LIST } from 'AppV2/Utils/trade-types-utils';
+import ImageGuide from 'Assets/SvgComponents/trade_explanations/img-guide.svg';
 import { useTraderStore } from 'Stores/useTraderStores';
 
 import GuideDefinitionModal from './guide-definition-modal';
@@ -93,6 +92,7 @@ const Guide = observer(
                                 trackAnalyticsEvent('ce_trade_types_form_v2', {
                                     action: 'info_open',
                                     trade_type_name: contract_type_title || contract_type,
+                                    source: 'trade_page',
                                 });
                                 setIsDescriptionOpened(true);
                             }}
@@ -108,6 +108,7 @@ const Guide = observer(
                                 trackAnalyticsEvent('ce_trade_types_form_v2', {
                                     action: 'info_open',
                                     trade_type_name: contract_type_title || contract_type,
+                                    source: 'trade_page',
                                 });
                                 setIsDescriptionOpened(true);
                             }}

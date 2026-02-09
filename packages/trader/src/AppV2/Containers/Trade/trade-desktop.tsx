@@ -82,7 +82,12 @@ const TradeDesktop = observer(() => {
     );
 
     const onTradeTypeSelect = React.useCallback(
-        (e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+        (
+            e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>,
+            source?: string,
+            _trade_type_count?: number,
+            tab?: 'all' | 'most_traded'
+        ) => {
             const selected_trade_type = trade_types.find(
                 ({ text }) => text === (e.target as HTMLButtonElement).textContent
             );
@@ -95,6 +100,8 @@ const TradeDesktop = observer(() => {
             trackAnalyticsEvent('ce_trade_types_form_v2', {
                 action: 'select_trade_type',
                 trade_type_name: selected_trade_type?.text || '',
+                source: source === 'trade_types_selector' ? 'trade_types_menu' : 'chip_bar',
+                ...(tab && { tab }),
             });
         },
         [trade_types, onChange]
