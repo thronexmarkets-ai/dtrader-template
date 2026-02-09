@@ -97,7 +97,7 @@ const TradeDesktop = observer(() => {
                 trade_type_name: selected_trade_type?.text || '',
             });
         },
-        [trade_types, onChange, symbol]
+        [trade_types, onChange]
     );
 
     React.useEffect(() => {

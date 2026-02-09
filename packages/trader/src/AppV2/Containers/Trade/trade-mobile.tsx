@@ -95,8 +95,7 @@ const Trade = observer(() => {
                 trade_type_name: selected_trade_type?.text || '',
             });
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [trade_types, onChange, symbol]
+        [trade_types, onChange]
     );
 
     React.useEffect(() => {

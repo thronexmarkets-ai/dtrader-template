@@ -1,20 +1,24 @@
 import React from 'react';
-import { observer } from 'mobx-react-lite';
 import classNames from 'classnames';
-import { useStore } from '@deriv/stores';
+import { observer } from 'mobx-react-lite';
+
 import {
     StandaloneChartAreaFillIcon,
     StandaloneChartAreaRegularIcon,
     StandaloneClockThreeFillIcon,
     StandaloneClockThreeRegularIcon,
 } from '@deriv/quill-icons';
-import { Badge } from '@deriv-com/quill-ui';
-import { useDevice } from '@deriv-com/ui';
 import { routes } from '@deriv/shared';
+import { useStore } from '@deriv/stores';
+import { Badge } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
-import BottomNav from 'AppV2/Components/BottomNav';
-import Router from '../../Routes/router';
+import { useDevice } from '@deriv-com/ui';
+
 import Sidebar from 'App/Components/Layout/Sidebar/sidebar';
+import BottomNav from 'AppV2/Components/BottomNav';
+
+import Router from '../../Routes/router';
+
 import './app-shell.scss';
 
 const AppShell = observer(() => {
@@ -24,6 +28,26 @@ const AppShell = observer(() => {
     const { active_sidebar_flyout } = ui;
     const { isMobile } = useDevice();
 
+    const renderPositionIcon = (IconComponent: typeof StandaloneClockThreeRegularIcon) => {
+        const icon = <IconComponent iconSize='sm' />;
+        if (active_positions_count > 0) {
+            return (
+                <Badge
+                    variant='notification'
+                    position='top-right'
+                    label={active_positions_count.toString()}
+                    color='danger'
+                    size='sm'
+                    contentSize='sm'
+                    className='bottom-nav-item__position-badge'
+                >
+                    {icon}
+                </Badge>
+            );
+        }
+        return icon;
+    };
+
     const bottomNavItems = [
         {
             icon: <StandaloneChartAreaRegularIcon iconSize='sm' />,
@@ -32,38 +56,8 @@ const AppShell = observer(() => {
             path: routes.index,
         },
         {
-            icon:
-                active_positions_count > 0 ? (
-                    <Badge
-                        variant='notification'
-                        position='top-right'
-                        label={active_positions_count.toString()}
-                        color='danger'
-                        size='sm'
-                        contentSize='sm'
-                        className='bottom-nav-item__position-badge'
-                    >
-                        <StandaloneClockThreeRegularIcon iconSize='sm' />
-                    </Badge>
-                ) : (
-                    <StandaloneClockThreeRegularIcon iconSize='sm' />
-                ),
-            activeIcon:
-                active_positions_count > 0 ? (
-                    <Badge
-                        variant='notification'
-                        position='top-right'
-                        label={active_positions_count.toString()}
-                        color='danger'
-                        size='sm'
-                        contentSize='sm'
-                        className='bottom-nav-item__position-badge'
-                    >
-                        <StandaloneClockThreeFillIcon iconSize='sm' />
-                    </Badge>
-                ) : (
-                    <StandaloneClockThreeFillIcon iconSize='sm' />
-                ),
+            icon: renderPositionIcon(StandaloneClockThreeRegularIcon),
+            activeIcon: renderPositionIcon(StandaloneClockThreeFillIcon),
             label: (
                 <React.Fragment>
                     <span className='user-guide__anchor' />
@@ -74,7 +68,8 @@ const AppShell = observer(() => {
         },
     ];
 
-    const should_show_bottomnav = isMobile && is_logged_in && !window.location.pathname.startsWith('/contract');
+    const should_show_bottomnav =
+        isMobile && is_logged_in && !window.location.pathname.startsWith(routes.contract.replace('/:contract_id', ''));
 
     return (
         <div className='app-shell'>

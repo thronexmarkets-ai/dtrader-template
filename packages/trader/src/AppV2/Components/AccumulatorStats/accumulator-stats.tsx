@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import clsx from 'clsx';
 
 import { LabelPairedChevronUpSmBoldIcon, LabelPairedXmarkMdRegularIcon } from '@deriv/quill-icons';
 import { observer } from '@deriv/stores';
@@ -89,7 +90,7 @@ const AccumulatorStats = observer(() => {
     const [is_expanded_desktop, setIsExpandedDesktop] = useState(false);
     const [is_modal_open, setIsModalOpen] = useState(false);
     const [animation_class, setAnimationClass] = useState('');
-    const [last_value, setLastValue] = useState<number | null>(null);
+    const last_value_ref = useRef<number | null>(null);
     const [is_moving_transaction, setIsMovingTransition] = useState(false);
 
     const ticks_history = useMemo(() => {
@@ -124,7 +125,7 @@ const AccumulatorStats = observer(() => {
             clearTimeout(error_timeout);
             clearTimeout(transition_timeout);
 
-            const is_same_value = last_value === rows[0][1];
+            const is_same_value = last_value_ref.current === rows[0][1];
 
             is_same_value
                 ? (error_timeout = setTimeout(() => setAnimationClass('animate-error'), 0))
@@ -135,7 +136,7 @@ const AccumulatorStats = observer(() => {
                 transition_timeout = setTimeout(() => setIsMovingTransition(false), 600);
             }
 
-            setLastValue(rows[0][0]);
+            last_value_ref.current = rows[0][0];
         }
 
         return () => {
@@ -143,7 +144,7 @@ const AccumulatorStats = observer(() => {
             clearTimeout(error_timeout);
             clearTimeout(transition_timeout);
         };
-    }, [rows[0]?.[0], ticks_history, last_value]);
+    }, [ticks_history]);
 
     if (rows.length === 0) {
         return null;
@@ -183,16 +184,14 @@ const AccumulatorStats = observer(() => {
                         </>
                     )}
                     <button
-                        className='accumulators-stats-v2__container__expand'
+                        className={clsx('accumulators-stats-v2__container__expand', {
+                            'accumulators-stats-v2__container__expand--rotated': isDesktop && is_expanded_desktop,
+                        })}
                         onClick={() => (isDesktop ? setIsExpandedDesktop(!is_expanded_desktop) : setIsOpen(true))}
                     >
                         <LabelPairedChevronUpSmBoldIcon
                             data-testid='expand-stats-icon'
                             fill='var(--semantic-color-monochrome-textIcon-normal-high)'
-                            style={{
-                                transform: isDesktop && is_expanded_desktop ? 'rotate(180deg)' : 'none',
-                                transition: 'transform 0.3s ease',
-                            }}
                         />
                     </button>
                 </div>

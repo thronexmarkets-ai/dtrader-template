@@ -21,7 +21,7 @@ const BottomNav = ({ bottomNavItems }: BottomNavProps) => {
 
     const navIndex = bottomNavItems?.findIndex(item => item.path === location.pathname);
 
-    const [selectedIndex, setSelectedIndex] = React.useState(navIndex && navIndex > -1 ? navIndex : 0);
+    const [selectedIndex, setSelectedIndex] = React.useState(navIndex !== undefined && navIndex > -1 ? navIndex : 0);
 
     const handleSelect = (index: number) => {
         setSelectedIndex(index);
