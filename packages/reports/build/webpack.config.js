@@ -25,20 +25,12 @@ module.exports = function (env) {
             minimizer: MINIMIZERS,
             splitChunks: {
                 chunks: 'all',
-                minSize: 75000, // Balanced for slow networks (not too granular)
+                minSize: 75000, // 75KB minimum chunk size for balanced granularity
                 minSizeReduction: 75000,
-                maxSize: 500000, // Prevent overly large chunks
+                maxSize: 1000000, // 1MB max chunks - fewer chunks for better performance
                 maxAsyncRequests: 30,
                 maxInitialRequests: 30,
                 cacheGroups: {
-                    // Deriv UI library
-                    derivUI: {
-                        test: /[\\/]node_modules[\\/]@deriv-com[\\/]ui[\\/]/,
-                        name: 'deriv-ui-vendor',
-                        priority: 32,
-                        enforce: true,
-                        reuseExistingChunk: true,
-                    },
                     default: {
                         minChunks: 2,
                         minSize: 75000,
@@ -75,6 +67,8 @@ module.exports = function (env) {
                 '@deriv/components': '@deriv/components',
                 '@deriv-com/translations': '@deriv-com/translations',
                 '@deriv-com/analytics': '@deriv-com/analytics',
+                moment: 'moment',
+                dayjs: 'dayjs',
             },
             /^@deriv\/shared\/.+$/,
             /^@deriv\/components\/.+$/,

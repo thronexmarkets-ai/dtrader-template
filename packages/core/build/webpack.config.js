@@ -46,14 +46,14 @@ module.exports = function (env) {
             minimizer: MINIMIZERS,
             splitChunks: {
                 chunks: 'all',
-                minSize: 75000, // Balanced: not too granular (75KB) nor too large (100KB) for slow networks
+                minSize: 75000, // 75KB minimum chunk size for balanced granularity
                 minSizeReduction: 75000, // Match minSize for consistency
                 minChunks: 1,
-                maxSize: 500000, // Reduced from 2500000 - enforce 500KB max chunks
+                maxSize: 1000000, // 1MB max chunks - fewer chunks for better performance
                 maxAsyncRequests: 30,
                 maxInitialRequests: 30,
                 automaticNameDelimiter: '~',
-                enforceSizeThreshold: 500000,
+                enforceSizeThreshold: 1000000, // Allow enforced cache groups to be up to 1MB without splitting
                 cacheGroups: {
                     // Split vendor CSS into separate file
                     // This ensures vendor CSS loads before app CSS in HTML
@@ -69,42 +69,27 @@ module.exports = function (env) {
                         priority: 30,
                         enforce: true,
                     },
-                    // Split React ecosystem for better caching
-                    react: {
-                        test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/,
-                        name: 'react-vendor',
+                    // React + MobX
+                    framework: {
+                        test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler|mobx|mobx-react-lite|mobx-utils)[\\/]/,
+                        name: 'framework-vendor',
                         priority: 40,
                         enforce: true,
                         reuseExistingChunk: true,
                     },
-                    // Split MobX for better caching
-                    mobx: {
-                        test: /[\\/]node_modules[\\/](mobx|mobx-react-lite|mobx-utils)[\\/]/,
-                        name: 'mobx-vendor',
+                    // UI + shared/translations
+                    deriv: {
+                        test: /[\\/]node_modules[\\/](@deriv-com[\\/]ui|@deriv[\\/]components|@deriv[\\/]shared|@deriv-com[\\/]translations)[\\/]/,
+                        name: 'deriv-vendor',
                         priority: 35,
                         enforce: true,
                         reuseExistingChunk: true,
                     },
-                    // Split UI libraries
-                    ui: {
-                        test: /[\\/]node_modules[\\/](@deriv-com[\\/]ui|@deriv[\\/]components)[\\/]/,
-                        name: 'ui-vendor',
-                        priority: 32,
-                        enforce: true,
-                        reuseExistingChunk: true,
-                    },
-                    // Split out large, stable chart library for better caching
-                    charts: {
-                        test: /[\\/]node_modules[\\/]@deriv-com[\\/]smartcharts-champion[\\/]/,
-                        name: 'charts',
-                        priority: 20,
-                        reuseExistingChunk: true,
-                    },
-                    // Split shared/translations
-                    shared: {
-                        test: /[\\/]node_modules[\\/](@deriv[\\/]shared|@deriv-com[\\/]translations)[\\/]/,
-                        name: 'shared-vendor',
-                        priority: 25,
+                    // Split date/time libraries
+                    datetime: {
+                        test: /[\\/]node_modules[\\/](moment|dayjs)[\\/]/,
+                        name: 'datetime-vendor',
+                        priority: 28,
                         enforce: true,
                         reuseExistingChunk: true,
                     },

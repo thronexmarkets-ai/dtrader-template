@@ -25,28 +25,12 @@ module.exports = function (env) {
             minimizer: MINIMIZERS,
             splitChunks: {
                 chunks: 'all',
-                minSize: 75000, // Balanced for slow networks (not too granular)
+                minSize: 75000, // 75KB minimum chunk size for balanced granularity
                 minSizeReduction: 75000,
-                maxSize: 500000, // Prevent overly large chunks
+                maxSize: 1000000, // 1MB max chunks - fewer chunks for better performance
                 maxAsyncRequests: 30,
                 maxInitialRequests: 30,
                 cacheGroups: {
-                    // Quill UI library (large, stable)
-                    quillUI: {
-                        test: /[\\/]node_modules[\\/]@deriv-com[\\/]quill-ui[\\/]/,
-                        name: 'quill-ui-vendor',
-                        priority: 35,
-                        enforce: true,
-                        reuseExistingChunk: true,
-                    },
-                    // TanStack React Query
-                    reactQuery: {
-                        test: /[\\/]node_modules[\\/]@tanstack[\\/]react-query[\\/]/,
-                        name: 'react-query-vendor',
-                        priority: 32,
-                        enforce: true,
-                        reuseExistingChunk: true,
-                    },
                     default: {
                         minChunks: 2,
                         minSize: 75000,
@@ -84,6 +68,8 @@ module.exports = function (env) {
                 '@deriv-com/translations': '@deriv-com/translations',
                 '@deriv-com/smartcharts-champion': '@deriv-com/smartcharts-champion',
                 '@deriv-com/analytics': '@deriv-com/analytics',
+                moment: 'moment',
+                dayjs: 'dayjs',
             },
             /^@deriv\/shared\/.+$/,
             /^@deriv\/components\/.+$/,
