@@ -98,7 +98,7 @@ describe('Duration', () => {
     it('should render the Duration component with default values', () => {
         mockDuration();
         expect(screen.getByLabelText('Duration')).toBeInTheDocument();
-        expect(screen.getByDisplayValue('30 minutes')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('30 min')).toBeInTheDocument();
     });
 
     it('should render the correct value for duration in hours and minutes', () => {
@@ -139,7 +139,7 @@ describe('Duration', () => {
 
     it('should calculate the correct duration based on the smallest unit from the store', () => {
         mockDuration();
-        const smallest_duration = screen.getByDisplayValue('30 minutes');
+        const smallest_duration = screen.getByDisplayValue('30 min');
         expect(smallest_duration).toBeInTheDocument();
     });
 
@@ -147,7 +147,7 @@ describe('Duration', () => {
         default_trade_store.modules.trade.duration = 45;
         default_trade_store.modules.trade.duration_unit = 's';
         mockDuration();
-        expect(screen.getByDisplayValue('45 seconds')).toBeInTheDocument();
+        expect(screen.getByDisplayValue('45 sec')).toBeInTheDocument();
     });
 
     it('should display correct duration in ticks when tick duration is selected', () => {

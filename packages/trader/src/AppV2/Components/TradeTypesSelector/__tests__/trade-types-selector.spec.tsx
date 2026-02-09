@@ -75,7 +75,8 @@ describe('TradeTypesSelector', () => {
         await waitFor(() => {
             expect(screen.getByTestId('mock-popover')).toBeInTheDocument();
         });
-        expect(gridButton).toHaveAttribute('aria-expanded', 'true');
+        // Re-query button as it re-renders outside TooltipPortal when open
+        expect(screen.getByRole('button', { name: /view all trade types/i })).toHaveAttribute('aria-expanded', 'true');
     });
 
     it('should render modal with proper ARIA attributes when open', async () => {
@@ -153,7 +154,7 @@ describe('TradeTypesSelector', () => {
     it('should close popover and reset tab to "all" when Guide button is clicked', async () => {
         render(<TradeTypesSelector {...defaultProps} />);
 
-        const gridButton = screen.getByRole('button', { name: /view all trade types/i });
+        let gridButton = screen.getByRole('button', { name: /view all trade types/i });
         await userEvent.click(gridButton);
 
         // Switch to "Most traded" tab
@@ -168,7 +169,8 @@ describe('TradeTypesSelector', () => {
             expect(screen.queryByTestId('mock-popover')).not.toBeInTheDocument();
         });
 
-        // Reopen popover and verify tab is reset to "All"
+        // Reopen popover - re-query button as it moved back into TooltipPortal
+        gridButton = screen.getByRole('button', { name: /view all trade types/i });
         await userEvent.click(gridButton);
 
         await waitFor(() => {
@@ -198,7 +200,10 @@ describe('TradeTypesSelector', () => {
         await userEvent.click(gridButton);
 
         await waitFor(() => {
-            expect(gridButton).toHaveClass('trade-types-selector__button--active');
+            // Re-query button as it re-renders outside TooltipPortal when open
+            expect(screen.getByRole('button', { name: /view all trade types/i })).toHaveClass(
+                'trade-types-selector__button--active'
+            );
         });
     });
 

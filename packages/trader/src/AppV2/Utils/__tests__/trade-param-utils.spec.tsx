@@ -39,6 +39,7 @@ describe('getTradeParams', () => {
             multiplier: true,
             stake: true,
             risk_management: true,
+            multipliers_info: true,
         });
     });
 
@@ -48,6 +49,7 @@ describe('getTradeParams', () => {
             multiplier: true,
             stake: true,
             risk_management: true,
+            multipliers_info: true,
             expiration: true,
         });
     });

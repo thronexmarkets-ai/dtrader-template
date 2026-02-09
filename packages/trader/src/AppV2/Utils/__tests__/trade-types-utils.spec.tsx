@@ -22,16 +22,16 @@ describe('trade-types-utils', () => {
             expect(grouped).toHaveProperty('directional');
             expect(grouped).toHaveProperty('digit_based');
 
-            // Growth based should contain Accumulators
-            expect(grouped.growth_based).toHaveLength(1);
-            expect(grouped.growth_based[0].tradeType).toBe('Accumulators');
+            // Growth based should contain Accumulators, Multipliers, Turbos, Vanillas
+            expect(grouped.growth_based).toHaveLength(4);
+            expect(grouped.growth_based.map(c => c.tradeType)).toContain('Accumulators');
+            expect(grouped.growth_based.map(c => c.tradeType)).toContain('Multipliers');
+            expect(grouped.growth_based.map(c => c.tradeType)).toContain('Turbos');
+            expect(grouped.growth_based.map(c => c.tradeType)).toContain('Vanillas');
 
-            // Directional should contain 6 contracts
-            expect(grouped.directional).toHaveLength(6);
+            // Directional should contain 3 contracts
+            expect(grouped.directional).toHaveLength(3);
             expect(grouped.directional.map(c => c.tradeType)).toContain('Rise/Fall');
-            expect(grouped.directional.map(c => c.tradeType)).toContain('Multipliers');
-            expect(grouped.directional.map(c => c.tradeType)).toContain('Turbos');
-            expect(grouped.directional.map(c => c.tradeType)).toContain('Vanillas');
             expect(grouped.directional.map(c => c.tradeType)).toContain('Higher/Lower');
             expect(grouped.directional.map(c => c.tradeType)).toContain('Touch/No Touch');
 
@@ -54,10 +54,14 @@ describe('trade-types-utils', () => {
             // Verify order matches AVAILABLE_CONTRACTS order
             const directionalTypes = grouped.directional.map(c => c.tradeType);
             expect(directionalTypes[0]).toBe('Rise/Fall');
-            expect(directionalTypes[1]).toBe('Multipliers');
-            expect(directionalTypes[2]).toBe('Turbos');
-            expect(directionalTypes[3]).toBe('Vanillas');
-            expect(directionalTypes[4]).toBe('Higher/Lower');
+            expect(directionalTypes[1]).toBe('Higher/Lower');
+            expect(directionalTypes[2]).toBe('Touch/No Touch');
+
+            const growthTypes = grouped.growth_based.map(c => c.tradeType);
+            expect(growthTypes[0]).toBe('Accumulators');
+            expect(growthTypes[1]).toBe('Multipliers');
+            expect(growthTypes[2]).toBe('Turbos');
+            expect(growthTypes[3]).toBe('Vanillas');
         });
 
         it('should group single contract correctly', () => {
@@ -65,8 +69,8 @@ describe('trade-types-utils', () => {
             const grouped = groupTradeTypesByCategory(singleContract);
 
             expect(Object.keys(grouped)).toHaveLength(1);
-            expect(grouped.growth_based).toHaveLength(1);
-            expect(grouped.growth_based[0].tradeType).toBe('Accumulators');
+            expect(grouped.directional).toHaveLength(1);
+            expect(grouped.directional[0].tradeType).toBe('Rise/Fall');
         });
     });
 
@@ -163,7 +167,7 @@ describe('trade-types-utils', () => {
             const contracts = getAvailableContracts(allowedTypes);
 
             expect(contracts).toHaveLength(3);
-            expect(contracts.map(c => c.id)).toEqual(['Accumulators', 'Rise/Fall', 'Multipliers']);
+            expect(contracts.map(c => c.id)).toEqual(['Rise/Fall', 'Accumulators', 'Multipliers']);
         });
 
         it('should return empty array when no contracts match filter', () => {
@@ -214,11 +218,11 @@ describe('trade-types-utils', () => {
             const sorted = sortCategoriesInTradeTypeOrder(mockTradeTypes, mockCategories);
 
             // Expected order based on AVAILABLE_CONTRACTS:
-            // 1. Accumulators (index 0)
-            // 2. Rise/Fall (index 1)
+            // 1. Rise/Fall (index 0)
+            // 2. Accumulators (index 1)
             // 3. Multipliers (index 2)
             // 4. Turbos (index 3)
-            expect(sorted.map(c => c.title)).toEqual(['Accumulators', 'Rise/Fall', 'Multipliers', 'Turbos']);
+            expect(sorted.map(c => c.title)).toEqual(['Rise/Fall', 'Accumulators', 'Multipliers', 'Turbos']);
         });
 
         it('should filter out categories not in trade_types', () => {

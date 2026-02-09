@@ -148,12 +148,12 @@ describe('DurationTicksInputDesktop', () => {
             expect(screen.getByText('Please enter a duration between 1 to 10 ticks.')).toBeInTheDocument();
         });
 
-        it('shows error for large value (100)', async () => {
+        it('shows error for large value (99)', async () => {
             render(<DurationTicksInputDesktop {...defaultProps} />);
 
             const input = screen.getByRole('textbox');
             await userEvent.clear(input);
-            await userEvent.type(input, '100');
+            await userEvent.type(input, '99');
 
             expect(screen.getByText('Please enter a duration between 1 to 10 ticks.')).toBeInTheDocument();
         });

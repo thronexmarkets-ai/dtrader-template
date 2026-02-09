@@ -30,7 +30,7 @@ describe('TimeGridPicker', () => {
 
         for (let i = 0; i < 24; i++) {
             const hour = String(i).padStart(2, '0');
-            expect(screen.getByText(hour)).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: `Hour ${hour}` })).toBeInTheDocument();
         }
     });
 
@@ -39,7 +39,7 @@ describe('TimeGridPicker', () => {
 
         const expectedMinutes = ['00', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55'];
         expectedMinutes.forEach(minute => {
-            expect(screen.getByText(minute)).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: `Minute ${minute}` })).toBeInTheDocument();
         });
     });
 

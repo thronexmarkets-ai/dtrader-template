@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { TRADE_TYPES } from '@deriv/shared';
@@ -12,6 +12,12 @@ jest.mock('@deriv-com/quill-ui', () => ({
         <span className={`quill-text ${size ? `size-${size}` : ''} ${className || ''}`}>{children}</span>
     ),
 }));
+
+jest.mock('../../FireIcon', () => {
+    const MockFireIcon = () => <span data-testid='dt_fire_icon' />;
+    MockFireIcon.displayName = 'FireIcon';
+    return { __esModule: true, default: MockFireIcon };
+});
 
 const mockOnTradeTypeSelect = jest.fn();
 
@@ -74,15 +80,15 @@ describe('TradeTypesSelectorContent', () => {
         render(<TradeTypesSelectorContent {...defaultProps} />);
 
         // Accumulators and Rise/Fall have show_fire_icon: true
-        const accumulatorsText = screen.getByText(/Accumulators/);
-        const riseFallText = screen.getByText(/Rise\/Fall/);
+        const accumulatorButton = screen.getByRole('button', { name: /select accumulators trade type/i });
+        const riseFallButton = screen.getByRole('button', { name: /select rise\/fall trade type/i });
 
-        expect(accumulatorsText).toHaveTextContent(/🔥/);
-        expect(riseFallText).toHaveTextContent(/🔥/);
+        expect(within(accumulatorButton).getByTestId('dt_fire_icon')).toBeInTheDocument();
+        expect(within(riseFallButton).getByTestId('dt_fire_icon')).toBeInTheDocument();
 
         // Multipliers does not have show_fire_icon
-        const multipliersText = screen.getByText(/Multipliers/);
-        expect(multipliersText).not.toHaveTextContent(/🔥/);
+        const multipliersButton = screen.getByRole('button', { name: /select multipliers trade type/i });
+        expect(within(multipliersButton).queryByTestId('dt_fire_icon')).not.toBeInTheDocument();
     });
 
     it('should mark currently selected trade type with selected class', () => {

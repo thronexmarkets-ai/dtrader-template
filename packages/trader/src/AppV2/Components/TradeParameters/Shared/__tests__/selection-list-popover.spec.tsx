@@ -57,14 +57,14 @@ describe('SelectionListPopover', () => {
         it('renders options as buttons', () => {
             render(<SelectionListPopover {...defaultProps} />);
 
-            const buttons = screen.getAllByRole('button');
+            const buttons = screen.getAllByRole('option');
             expect(buttons).toHaveLength(3);
         });
 
         it('applies selected class to the selected option', () => {
             render(<SelectionListPopover {...defaultProps} selectedValue={2} />);
 
-            const buttons = screen.getAllByRole('button');
+            const buttons = screen.getAllByRole('option');
             const option2Button = buttons.find(btn => btn.textContent === 'Option 2');
             expect(option2Button).toHaveClass('test-popover__option--selected');
         });
@@ -72,7 +72,7 @@ describe('SelectionListPopover', () => {
         it('does not apply selected class to non-selected options', () => {
             render(<SelectionListPopover {...defaultProps} selectedValue={2} />);
 
-            const buttons = screen.getAllByRole('button');
+            const buttons = screen.getAllByRole('option');
             const option1Button = buttons.find(btn => btn.textContent === 'Option 1');
             const option3Button = buttons.find(btn => btn.textContent === 'Option 3');
 
@@ -159,7 +159,7 @@ describe('SelectionListPopover', () => {
 
             render(<SelectionListPopover {...stringProps} />);
 
-            const buttons = screen.getAllByRole('button');
+            const buttons = screen.getAllByRole('option');
             const highButton = buttons.find(btn => btn.textContent === 'High');
             expect(highButton).toHaveClass('test-popover__option--selected');
         });
@@ -169,7 +169,7 @@ describe('SelectionListPopover', () => {
         it('allows keyboard navigation with Tab', async () => {
             render(<SelectionListPopover {...defaultProps} />);
 
-            const buttons = screen.getAllByRole('button');
+            const buttons = screen.getAllByRole('option');
 
             await userEvent.tab();
             expect(buttons[0]).toHaveFocus();
@@ -208,7 +208,7 @@ describe('SelectionListPopover', () => {
         it('supports reverse tab navigation', async () => {
             render(<SelectionListPopover {...defaultProps} />);
 
-            const buttons = screen.getAllByRole('button');
+            const buttons = screen.getAllByRole('option');
 
             buttons[2].focus();
             expect(buttons[2]).toHaveFocus();
@@ -230,7 +230,7 @@ describe('SelectionListPopover', () => {
 
             render(<SelectionListPopover {...emptyProps} />);
 
-            const buttons = screen.queryAllByRole('button');
+            const buttons = screen.queryAllByRole('option');
             expect(buttons).toHaveLength(0);
             const listbox = screen.getByRole('listbox');
             expect(listbox).toHaveClass('test-popover__content');
@@ -247,7 +247,7 @@ describe('SelectionListPopover', () => {
 
             expect(screen.getByText('Only Option')).toBeInTheDocument();
 
-            const button = screen.getByRole('button');
+            const button = screen.getByRole('option');
             expect(button).toHaveClass('test-popover__option--selected');
         });
 
@@ -320,7 +320,7 @@ describe('SelectionListPopover', () => {
         it('renders buttons with correct type attribute', () => {
             render(<SelectionListPopover {...defaultProps} />);
 
-            const buttons = screen.getAllByRole('button');
+            const buttons = screen.getAllByRole('option');
             buttons.forEach(button => {
                 expect(button).toHaveAttribute('type', 'button');
             });
@@ -329,7 +329,7 @@ describe('SelectionListPopover', () => {
         it('renders correct number of option buttons', () => {
             render(<SelectionListPopover {...defaultProps} />);
 
-            const buttons = screen.getAllByRole('button');
+            const buttons = screen.getAllByRole('option');
             expect(buttons).toHaveLength(3);
         });
     });

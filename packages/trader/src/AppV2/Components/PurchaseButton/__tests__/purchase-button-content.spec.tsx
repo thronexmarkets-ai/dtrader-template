@@ -63,7 +63,7 @@ describe('PurchaseButtonContent', () => {
         };
         render(<PurchaseButtonContent {...mock_props} is_multiplier info={multipliers_info as TInfo} />);
 
-        expect(screen.getByText(localized_basis.stake)).toBeInTheDocument();
+        expect(screen.getByText('Total cost')).toBeInTheDocument();
         expect(screen.getByText(/10/)).toBeInTheDocument();
         expect(screen.getByText(/USD/i)).toBeInTheDocument();
     });
