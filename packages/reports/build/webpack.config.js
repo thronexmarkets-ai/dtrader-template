@@ -23,6 +23,36 @@ module.exports = function (env) {
             moduleIds: 'named',
             minimize: IS_RELEASE,
             minimizer: MINIMIZERS,
+            splitChunks: {
+                chunks: 'all',
+                minSize: 75000, // Balanced for slow networks (not too granular)
+                minSizeReduction: 75000,
+                maxSize: 500000, // Prevent overly large chunks
+                maxAsyncRequests: 30,
+                maxInitialRequests: 30,
+                cacheGroups: {
+                    // Deriv UI library
+                    derivUI: {
+                        test: /[\\/]node_modules[\\/]@deriv-com[\\/]ui[\\/]/,
+                        name: 'deriv-ui-vendor',
+                        priority: 32,
+                        enforce: true,
+                        reuseExistingChunk: true,
+                    },
+                    default: {
+                        minChunks: 2,
+                        minSize: 75000,
+                        priority: -20,
+                        reuseExistingChunk: true,
+                    },
+                    defaultVendors: {
+                        idHint: 'vendors',
+                        test: /[\\/]node_modules[\\/]/,
+                        priority: -10,
+                        reuseExistingChunk: true,
+                    },
+                },
+            },
         },
         output: {
             filename: 'reports/js/[name].js',

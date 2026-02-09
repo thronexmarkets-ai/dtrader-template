@@ -12,9 +12,6 @@ export const checkWhoAmI = async () => {
         const response = await fetch(whoamiUrl, {
             method: 'GET',
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
         });
 
         const data = await response.json();

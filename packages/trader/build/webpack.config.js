@@ -23,6 +23,44 @@ module.exports = function (env) {
             moduleIds: 'named',
             minimize: IS_RELEASE,
             minimizer: MINIMIZERS,
+            splitChunks: {
+                chunks: 'all',
+                minSize: 75000, // Balanced for slow networks (not too granular)
+                minSizeReduction: 75000,
+                maxSize: 500000, // Prevent overly large chunks
+                maxAsyncRequests: 30,
+                maxInitialRequests: 30,
+                cacheGroups: {
+                    // Quill UI library (large, stable)
+                    quillUI: {
+                        test: /[\\/]node_modules[\\/]@deriv-com[\\/]quill-ui[\\/]/,
+                        name: 'quill-ui-vendor',
+                        priority: 35,
+                        enforce: true,
+                        reuseExistingChunk: true,
+                    },
+                    // TanStack React Query
+                    reactQuery: {
+                        test: /[\\/]node_modules[\\/]@tanstack[\\/]react-query[\\/]/,
+                        name: 'react-query-vendor',
+                        priority: 32,
+                        enforce: true,
+                        reuseExistingChunk: true,
+                    },
+                    default: {
+                        minChunks: 2,
+                        minSize: 75000,
+                        priority: -20,
+                        reuseExistingChunk: true,
+                    },
+                    defaultVendors: {
+                        idHint: 'vendors',
+                        test: /[\\/]node_modules[\\/]/,
+                        priority: -10,
+                        reuseExistingChunk: true,
+                    },
+                },
+            },
         },
         output: {
             filename: 'trader/js/[name].js',

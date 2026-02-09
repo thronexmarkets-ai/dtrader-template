@@ -46,10 +46,10 @@ module.exports = function (env) {
             minimizer: MINIMIZERS,
             splitChunks: {
                 chunks: 'all',
-                minSize: 100000,
-                minSizeReduction: 102400,
+                minSize: 75000, // Balanced: not too granular (75KB) nor too large (100KB) for slow networks
+                minSizeReduction: 75000, // Match minSize for consistency
                 minChunks: 1,
-                maxSize: 2500000,
+                maxSize: 500000, // Reduced from 2500000 - enforce 500KB max chunks
                 maxAsyncRequests: 30,
                 maxInitialRequests: 30,
                 automaticNameDelimiter: '~',
@@ -69,6 +69,30 @@ module.exports = function (env) {
                         priority: 30,
                         enforce: true,
                     },
+                    // Split React ecosystem for better caching
+                    react: {
+                        test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/,
+                        name: 'react-vendor',
+                        priority: 40,
+                        enforce: true,
+                        reuseExistingChunk: true,
+                    },
+                    // Split MobX for better caching
+                    mobx: {
+                        test: /[\\/]node_modules[\\/](mobx|mobx-react-lite|mobx-utils)[\\/]/,
+                        name: 'mobx-vendor',
+                        priority: 35,
+                        enforce: true,
+                        reuseExistingChunk: true,
+                    },
+                    // Split UI libraries
+                    ui: {
+                        test: /[\\/]node_modules[\\/](@deriv-com[\\/]ui|@deriv[\\/]components)[\\/]/,
+                        name: 'ui-vendor',
+                        priority: 32,
+                        enforce: true,
+                        reuseExistingChunk: true,
+                    },
                     // Split out large, stable chart library for better caching
                     charts: {
                         test: /[\\/]node_modules[\\/]@deriv-com[\\/]smartcharts-champion[\\/]/,
@@ -76,9 +100,17 @@ module.exports = function (env) {
                         priority: 20,
                         reuseExistingChunk: true,
                     },
+                    // Split shared/translations
+                    shared: {
+                        test: /[\\/]node_modules[\\/](@deriv[\\/]shared|@deriv-com[\\/]translations)[\\/]/,
+                        name: 'shared-vendor',
+                        priority: 25,
+                        enforce: true,
+                        reuseExistingChunk: true,
+                    },
                     default: {
                         minChunks: 2,
-                        minSize: 102400,
+                        minSize: 75000, // Match global minSize for consistency
                         priority: -20,
                         reuseExistingChunk: true,
                     },
@@ -86,6 +118,7 @@ module.exports = function (env) {
                         idHint: 'vendors',
                         test: /[\\/]node_modules[\\/]/,
                         priority: -10,
+                        reuseExistingChunk: true,
                     },
                 },
             },

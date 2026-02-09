@@ -10,10 +10,16 @@ const copyConfig = base => {
         {
             from: path.resolve(__dirname, '../../../node_modules/@deriv-com/smartcharts-champion/dist'),
             to: 'js/smartcharts/',
+            globOptions: {
+                ignore: ['**/NOTICES'],
+            },
         },
         {
             from: path.resolve(__dirname, '../../../node_modules/@deriv-com/smartcharts-champion/dist/assets'),
             to: 'assets',
+            globOptions: {
+                ignore: ['**/NOTICES'],
+            },
         },
         {
             from: path.resolve(__dirname, '../../../node_modules/@deriv/trader/dist/trader'),
