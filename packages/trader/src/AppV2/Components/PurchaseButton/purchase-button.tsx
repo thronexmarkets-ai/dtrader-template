@@ -98,7 +98,10 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
     };
     const has_no_button_content =
         is_vanilla || is_vanilla_fx || is_turbos || (is_accumulator && !has_open_accu_contract);
-    const contract_types = getDisplayedContractTypes(trade_types, contract_type, trade_type_tab);
+    const contract_types = React.useMemo(
+        () => getDisplayedContractTypes(trade_types, contract_type, trade_type_tab),
+        [trade_types, contract_type, trade_type_tab]
+    );
     const is_valid_to_sell = active_accu_contract?.contract_info
         ? hasContractEntered(active_accu_contract.contract_info) &&
           isOpen(active_accu_contract.contract_info) &&
@@ -184,7 +187,10 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
                 }
                 return false;
             });
-            setErrorInfo({ has_error, message: message || '' });
+            setErrorInfo(prev => {
+                if (prev.has_error === has_error && prev.message === (message || '')) return prev;
+                return { has_error, message: message || '' };
+            });
         }
     }, [proposal_info, contract_types, trade_type_tab]);
 
