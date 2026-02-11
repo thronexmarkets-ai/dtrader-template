@@ -239,7 +239,7 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
                         const is_loading = loading_button_index === index;
                         const is_disabled =
                             !is_trade_enabled_v2 ||
-                            info.has_error ||
+                            (info.has_error && info.error_code !== 'InsufficientBalance') ||
                             (!!purchase_info.error && !is_modal_error) ||
                             is_switching_account;
 
