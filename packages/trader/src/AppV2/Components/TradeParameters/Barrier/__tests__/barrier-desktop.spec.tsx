@@ -17,6 +17,14 @@ describe('BarrierDesktop', () => {
                     ...mockStore({}).modules.trade,
                     barrier_1: '+0.5',
                     is_market_closed: false,
+                    symbol: '1HZ100V',
+                    active_symbols: [
+                        {
+                            underlying_symbol: '1HZ100V',
+                            market: 'synthetic_index',
+                            underlying_symbol_type: 'synthetic_index',
+                        },
+                    ],
                     tick_data: {
                         quote: 1234.56,
                         pip_size: 2,
@@ -27,10 +35,16 @@ describe('BarrierDesktop', () => {
         });
     });
 
-    const MockedBarrierDesktop = ({ store = default_mock_store }: { store?: ReturnType<typeof mockStore> }) => (
+    const MockedBarrierDesktop = ({
+        store = default_mock_store,
+        isDays = false,
+    }: {
+        store?: ReturnType<typeof mockStore>;
+        isDays?: boolean;
+    }) => (
         <TraderProviders store={store}>
             <ModulesProvider store={store}>
-                <BarrierDesktop is_minimized={false} />
+                <BarrierDesktop is_minimized={false} isDays={isDays} />
             </ModulesProvider>
         </TraderProviders>
     );
@@ -118,7 +132,7 @@ describe('BarrierDesktop', () => {
         render(
             <TraderProviders store={default_mock_store}>
                 <ModulesProvider store={default_mock_store}>
-                    <BarrierDesktop is_minimized={true} />
+                    <BarrierDesktop is_minimized={true} isDays={false} />
                 </ModulesProvider>
             </TraderProviders>
         );
@@ -126,5 +140,39 @@ describe('BarrierDesktop', () => {
         const textField = screen.getByRole('textbox');
         expect(textField).toBeInTheDocument();
         expect(textField).toHaveValue('+0.5');
+    });
+
+    it('shows only Fixed barrier tab when isDays is true', async () => {
+        render(<MockedBarrierDesktop isDays={true} />);
+
+        await userEvent.click(screen.getByText('Barrier'));
+
+        expect(screen.queryByText('Above spot')).not.toBeInTheDocument();
+        expect(screen.queryByText('Below spot')).not.toBeInTheDocument();
+        expect(screen.getByText('Fixed barrier')).toBeInTheDocument();
+    });
+
+    it('shows only Fixed barrier tab for forex markets', async () => {
+        default_mock_store.modules.trade.symbol = 'frxEURUSD';
+        default_mock_store.modules.trade.active_symbols = [
+            { underlying_symbol: 'frxEURUSD', market: 'forex', underlying_symbol_type: 'forex' },
+        ];
+        render(<MockedBarrierDesktop isDays={false} />);
+
+        await userEvent.click(screen.getByText('Barrier'));
+
+        expect(screen.queryByText('Above spot')).not.toBeInTheDocument();
+        expect(screen.queryByText('Below spot')).not.toBeInTheDocument();
+        expect(screen.getByText('Fixed barrier')).toBeInTheDocument();
+    });
+
+    it('shows all barrier type tabs for non-daily non-forex contracts', async () => {
+        render(<MockedBarrierDesktop isDays={false} />);
+
+        await userEvent.click(screen.getByText('Barrier'));
+
+        expect(screen.getByText('Above spot')).toBeInTheDocument();
+        expect(screen.getByText('Below spot')).toBeInTheDocument();
+        expect(screen.getByText('Fixed barrier')).toBeInTheDocument();
     });
 });

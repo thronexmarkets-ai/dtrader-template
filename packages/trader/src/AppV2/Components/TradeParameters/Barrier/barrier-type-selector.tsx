@@ -9,16 +9,25 @@ interface BarrierTypeSelectorProps {
     selectedType: string;
     onSelectType: (type: string) => void;
     className?: string;
+    showAllTypes?: boolean;
 }
 
-const BarrierTypeSelector: React.FC<BarrierTypeSelectorProps> = ({ selectedType, onSelectType, className }) => {
+const BarrierTypeSelector: React.FC<BarrierTypeSelectorProps> = ({
+    selectedType,
+    onSelectType,
+    className,
+    showAllTypes = true,
+}) => {
     const BARRIER_TYPES: VerticalTabItem[] = useMemo(
-        () => [
-            { value: 'above_spot', label: localize('Above spot') },
-            { value: 'below_spot', label: localize('Below spot') },
-            { value: 'fixed_barrier', label: localize('Fixed barrier') },
-        ],
-        []
+        () =>
+            showAllTypes
+                ? [
+                      { value: 'above_spot', label: localize('Above spot') },
+                      { value: 'below_spot', label: localize('Below spot') },
+                      { value: 'fixed_barrier', label: localize('Fixed barrier') },
+                  ]
+                : [{ value: 'fixed_barrier', label: localize('Fixed barrier') }],
+        [showAllTypes]
     );
 
     return (

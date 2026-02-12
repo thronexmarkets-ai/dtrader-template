@@ -22,10 +22,7 @@ const BarrierContentDesktop: React.FC<BarrierContentDesktopProps> = observer(({ 
 
     const getInitialValue = () => {
         if (!barrier_1) return '';
-        if (barrierType === 'above_spot' || barrierType === 'below_spot') {
-            return barrier_1.replace(/^[+-]/, '');
-        }
-        return barrier_1;
+        return barrier_1.replace(/^[+-]/, '');
     };
     const [inputValue, setInputValue] = useState(getInitialValue());
 

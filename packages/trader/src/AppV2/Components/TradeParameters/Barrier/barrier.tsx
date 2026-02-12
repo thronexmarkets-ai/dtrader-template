@@ -82,7 +82,7 @@ const Barrier = observer(({ is_minimized }: TTradeParametersProps) => {
     );
 
     if (isDesktop) {
-        return <BarrierDesktop is_minimized={is_minimized} />;
+        return <BarrierDesktop is_minimized={is_minimized} isDays={isDays} />;
     }
 
     return (
