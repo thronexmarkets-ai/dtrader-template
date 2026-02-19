@@ -17,6 +17,7 @@ import {
 } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { Button, useNotifications, useSnackbar } from '@deriv-com/quill-ui';
+import { useTranslations } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
 
 import useContractsFor from 'AppV2/Hooks/useContractsFor';
@@ -39,6 +40,7 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
     const [loading_button_index, setLoadingButtonIndex] = React.useState<number | null>(null);
     const purchaseButtonRef = React.useRef(null);
     const sellButtonRef = React.useRef(null);
+    const { localize } = useTranslations();
     const { isMobile } = useDevice();
     const { addBanner } = useNotifications();
     const { addSnackbar } = useSnackbar();
@@ -238,8 +240,10 @@ const PurchaseButton = observer(({ onPurchaseSuccess }: TPurchaseButtonProps = {
                                     size='lg'
                                     label={
                                         is_single_button
-                                            ? 'Buy'
-                                            : getContractTypeDisplay(trade_type, {
+                                            ? // [AI]
+                                              localize('Buy')
+                                            : // [/AI]
+                                              getContractTypeDisplay(trade_type, {
                                                   isHighLow: is_high_low,
                                                   showButtonName: true,
                                               })
