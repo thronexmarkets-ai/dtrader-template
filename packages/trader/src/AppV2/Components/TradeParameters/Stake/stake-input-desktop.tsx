@@ -440,7 +440,7 @@ const StakeInput = observer(({ onClose, is_open }: TStakeInput) => {
         <div className='stake-input-desktop__wrapper'>
             <TextField
                 id={input_id}
-                label={localize('Stake ({{currency}})', { currency: getCurrencyDisplayCode(currency) })}
+                label={`${localize('Stake')} (${getCurrencyDisplayCode(currency)})`}
                 name='amount'
                 value={proposal_request_values.amount}
                 onChange={onInputChange}
