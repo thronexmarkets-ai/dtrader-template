@@ -1270,7 +1270,7 @@ export default class TradeStore extends BaseStore {
                             // and then set the chart view to the start_time
                             // draw the start time line and show longcode then mount contract
                             // this.root_store.modules.contract_trade.drawContractStartTime(start_time, longcode, contract_id);
-                            if (!is_dtrader_v2) {
+                            if (!is_dtrader_v2 || !isMobile) {
                                 // Convert raw technical values to user-friendly display names
                                 // For trade_type_name, use the title from getContractTypesConfig which has human-friendly names
                                 const contract_types_config = getContractTypesConfig(this.symbol);
