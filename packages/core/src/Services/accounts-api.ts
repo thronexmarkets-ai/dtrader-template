@@ -37,9 +37,9 @@ const apiFetch = async (url: string, options: RequestInit = {}): Promise<Respons
     return res;
 };
 
-/** GET /trading/v1/derivatives/accounts */
+/** GET /trading/v1/options/accounts */
 export const fetchAccounts = async (): Promise<TAccount[]> => {
-    const res = await apiFetch(`${getApiV4BaseUrl()}/trading/v1/derivatives/accounts`);
+    const res = await apiFetch(`${getApiV4BaseUrl()}/trading/v1/options/accounts`);
     if (!res.ok) throw new Error(`fetchAccounts failed: ${res.status}`);
     return (await res.json()).data.data;
 };

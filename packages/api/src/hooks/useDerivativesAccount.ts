@@ -23,7 +23,7 @@ export const useDerivativesAccount = (loginid: string | undefined, enabled: bool
     return useQuery<TDerivativesAccountResponse, Error>(
         ['derivatives', 'account', loginid], // Query key includes loginid for cache invalidation on account switch
         () => {
-            return fetchREST<TDerivativesAccountResponse>(`/v1/derivatives/account`);
+            return fetchREST<TDerivativesAccountResponse>(`/v1/options/account`);
         }, // Query function
         {
             enabled, // Only fetch if enabled
