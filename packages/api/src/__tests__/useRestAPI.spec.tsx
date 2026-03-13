@@ -5,6 +5,10 @@ import { renderHook } from '@testing-library/react-hooks';
 import { APIContext } from '../APIProvider';
 import { useRestAPI } from '../useRestAPI';
 
+jest.mock('@deriv/shared', () => ({
+    getAppId: jest.fn(() => '16929'),
+}));
+
 // Mock fetch globally
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -12,6 +16,7 @@ global.fetch = mockFetch;
 describe('useRestAPI', () => {
     beforeEach(() => {
         jest.clearAllMocks();
+        sessionStorage.clear();
     });
 
     const mockContextValue = {
@@ -45,7 +50,7 @@ describe('useRestAPI', () => {
     });
 
     describe('fetchREST', () => {
-        it('should make GET request with credentials included', async () => {
+        it('should make GET request to correct URL', async () => {
             const mockData = { data: 'test' };
             mockFetch.mockResolvedValueOnce({
                 ok: true,
@@ -58,11 +63,38 @@ describe('useRestAPI', () => {
 
             expect(mockFetch).toHaveBeenCalledWith(
                 expect.stringContaining('/test-endpoint'),
-                expect.objectContaining({
-                    method: 'GET',
-                    credentials: 'include',
-                })
+                expect.objectContaining({ method: 'GET' })
             );
+        });
+
+        it('should include Authorization header when token is present', async () => {
+            sessionStorage.setItem(
+                'auth_info',
+                JSON.stringify({ access_token: 'test-token', expires_at: Date.now() + 60000 })
+            );
+
+            const mockData = { data: 'test' };
+            mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockData });
+
+            const { result } = renderHook(() => useRestAPI(), { wrapper });
+            await result.current.fetchREST('/test-endpoint');
+
+            const fetchCall = mockFetch.mock.calls[0][1];
+            expect(fetchCall.headers).toMatchObject({
+                Authorization: 'Bearer test-token',
+                'Deriv-App-ID': '16929',
+            });
+        });
+
+        it('should not include Authorization header when no token', async () => {
+            const mockData = { data: 'test' };
+            mockFetch.mockResolvedValueOnce({ ok: true, json: async () => mockData });
+
+            const { result } = renderHook(() => useRestAPI(), { wrapper });
+            await result.current.fetchREST('/test-endpoint');
+
+            const fetchCall = mockFetch.mock.calls[0][1];
+            expect(fetchCall.headers).not.toHaveProperty('Authorization');
         });
 
         it('should not set Content-Type header for GET requests', async () => {

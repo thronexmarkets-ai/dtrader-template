@@ -1,6 +1,24 @@
 import React from 'react';
 
+import { getAppId } from '@deriv/shared';
+
 import { APIContext } from './APIProvider';
+
+const AUTH_INFO_KEY = 'auth_info';
+
+const getStoredToken = (): string | null => {
+    try {
+        const info = JSON.parse(sessionStorage.getItem(AUTH_INFO_KEY) ?? 'null');
+        if (!info) return null;
+        if (info.expires_at && Date.now() >= info.expires_at) {
+            sessionStorage.removeItem(AUTH_INFO_KEY);
+            return null;
+        }
+        return info.access_token ?? null;
+    } catch {
+        return null;
+    }
+};
 
 /**
  * Hook to access REST API configuration from APIProvider
@@ -16,8 +34,8 @@ export const useRestAPI = () => {
     const { restAPIConfig } = context;
 
     /**
-     * Generic fetch wrapper with default config
-     * @param endpoint - API endpoint path (e.g., '/v1/options/account')
+     * Generic fetch wrapper with auth headers
+     * @param endpoint - API endpoint path (e.g., '/trading/v1/options/accounts')
      * @param options - Optional fetch options
      * @returns Promise with typed response
      */
@@ -27,14 +45,19 @@ export const useRestAPI = () => {
         // Determine the method (default to GET if not specified)
         const method = options?.method || 'GET';
 
-        // Only set Content-Type for methods that typically have a body
+        // Only set Content-Type for methods that have a body
         const shouldSetContentType = ['POST', 'PUT', 'PATCH'].includes(method);
+
+        const token = getStoredToken();
+        const authHeaders: Record<string, string> = token
+            ? { Authorization: `Bearer ${token}`, 'Deriv-App-ID': String(getAppId()) }
+            : {};
 
         const response = await fetch(url, {
             ...options,
             method,
-            credentials: 'include', // Send cookies by default for authentication
             headers: {
+                ...authHeaders,
                 ...(shouldSetContentType && { 'Content-Type': 'application/json' }),
                 ...options?.headers,
             },

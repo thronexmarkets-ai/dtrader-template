@@ -66,7 +66,7 @@ describe('useDerivativesAccount', () => {
             expect(result.current.isSuccess).toBe(true);
         });
 
-        expect(mockFetchREST).toHaveBeenCalledWith('/v1/options/account');
+        expect(mockFetchREST).toHaveBeenCalledWith('/trading/v1/options/accounts');
         expect(result.current.data).toEqual(mockData);
     });
 

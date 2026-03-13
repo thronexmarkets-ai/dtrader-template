@@ -47,7 +47,13 @@ const NetworkMonitorBase = (() => {
         if (isOnline()) {
             const ws_config = { wsEvent, isOnline, ...socket_general_functions };
             BinarySocket.init({ options: ws_config, client: client_store });
-            BinarySocket.openNewConnection();
+
+            // If a token exists, skip the public connection — client_store.init() will
+            // fetch an OTP and open an authenticated connection instead.
+            const has_token = !!JSON.parse(sessionStorage.getItem('auth_info') ?? 'null')?.access_token;
+            if (!has_token) {
+                BinarySocket.openNewConnection();
+            }
         }
 
         setNetworkStatus(isOnline() ? 'blinking' : 'offline');
