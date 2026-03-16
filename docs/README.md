@@ -56,6 +56,18 @@ Edit **`brand.config.json`** at the repo root:
     "home_url": "https://home.yourdomain.com/dashboard",
     "help_centre_url": "https://yourdomain.com/help"
   },
+  "deposit_url": {
+    "staging": "https://staging.trader.yourdomain.com/transfer",
+    "production": "https://trader.yourdomain.com/transfer"
+  },
+  "auth": {
+    "staging": "https://staging-auth.deriv.com",
+    "production": "https://auth.deriv.com",
+    "oauth_scopes": ["trade", "account_manage"],
+    "oauth_redirect_uri_staging": "https://staging.trader.yourdomain.com",
+    "oauth_redirect_uri_production": "https://trader.yourdomain.com",
+    "oauth_app_id": ""
+  },
   "app_id": {
     "staging": YOUR_STAGING_APP_ID,
     "production": YOUR_PRODUCTION_APP_ID
@@ -65,6 +77,8 @@ Edit **`brand.config.json`** at the repo root:
   }
 }
 ```
+
+> **`auth.oauth_app_id`** is your **Deriv API v1 app ID** (from [developers.deriv.com](https://developers.deriv.com)) — separate from the WebSocket `app_id` above. Leave it empty if you don't have one; it is optional and only appended to the login URL when set.
 
 ### 4. Set your OAuth Client ID
 
@@ -100,7 +114,7 @@ npm run build:all
 npm run serve core          # → https://localhost:8443
 ```
 
-For the full white-label walkthrough, see [WHITE_LABEL.md](../WHITE_LABEL.md).
+For the full white-label walkthrough, see [WHITE_LABEL.md](./WHITE_LABEL.md).
 
 ---
 
@@ -136,25 +150,30 @@ dtrader-template/
 
 All branding is controlled by `brand.config.json`. The key fields:
 
-| Field                        | Required | Description                                             |
-| ---------------------------- | -------- | ------------------------------------------------------- |
-| `brand_name`                 | ✅       | Your company name — appears in page title and meta tags |
-| `brand_domain`               | ✅       | Your production domain (e.g. `yourdomain.com`)          |
-| `brand_hostname.staging`     | ✅       | Staging hostname — also used as OAuth redirect URI      |
-| `brand_hostname.production`  | ✅       | Production hostname                                     |
-| `platform.name`              | ✅       | Platform display name                                   |
-| `platform.description`       | ✅       | Used in `<meta name="description">`                     |
-| `platform.home_url`          | ✅       | URL the sidebar Home button navigates to                |
-| `platform.help_centre_url`   | ✅       | URL for your help/support page                          |
-| `app_id.staging`             | ✅       | Deriv API App ID for staging                            |
-| `app_id.production`          | ✅       | Deriv API App ID for production                         |
-| `colors.primary`             | ✅       | Main brand color (hex)                                  |
-| `features.dark_mode`         | —        | Show dark mode toggle. Default: `false`                 |
-| `features.language_switcher` | —        | Show language switcher. Default: `false`                |
+| Field                                | Required | Description                                                                                          |
+| ------------------------------------ | -------- | ---------------------------------------------------------------------------------------------------- |
+| `brand_name`                         | ✅       | Your company name — appears in page title and meta tags                                              |
+| `brand_domain`                       | ✅       | Your production domain (e.g. `yourdomain.com`)                                                       |
+| `brand_hostname.staging`             | ✅       | Staging hostname — also used as OAuth redirect URI                                                   |
+| `brand_hostname.production`          | ✅       | Production hostname                                                                                  |
+| `platform.name`                      | ✅       | Platform display name                                                                                |
+| `platform.description`               | ✅       | Used in `<meta name="description">`                                                                  |
+| `platform.home_url`                  | ✅       | URL the sidebar Home button navigates to                                                             |
+| `platform.help_centre_url`           | ✅       | URL for your help/support page                                                                       |
+| `deposit_url.staging`                | ✅       | Staging URL for the Deposit button in the account header                                             |
+| `deposit_url.production`             | ✅       | Production URL for the Deposit button                                                                |
+| `auth.oauth_redirect_uri_staging`    | ✅       | OAuth2 redirect URI for staging — must match your app registration exactly                           |
+| `auth.oauth_redirect_uri_production` | ✅       | OAuth2 redirect URI for production — must match your app registration exactly                        |
+| `auth.oauth_app_id`                  | —        | Your **Deriv API v1 app ID** — appended to the login URL when set. Leave empty if you don't have one |
+| `app_id.staging`                     | ✅       | Deriv WebSocket API app ID for staging                                                               |
+| `app_id.production`                  | ✅       | Deriv WebSocket API app ID for production                                                            |
+| `colors.primary`                     | ✅       | Main brand color (hex)                                                                               |
+| `features.dark_mode`                 | —        | Show dark mode toggle. Default: `false`                                                              |
+| `features.language_switcher`         | —        | Show language switcher. Default: `false`                                                             |
 
-> **`OAUTH_CLIENT_ID` is not in `brand.config.json`** — set it as an environment variable or CI secret. See [WHITE_LABEL.md](../WHITE_LABEL.md#getting-a-deriv-oauth-client-id).
+> **`OAUTH_CLIENT_ID` is not in `brand.config.json`** — set it as an environment variable or CI secret. See [WHITE_LABEL.md](./WHITE_LABEL.md#getting-a-deriv-oauth-client-id).
 
-For the full field reference and color pipeline docs, see [WHITE_LABEL.md](../WHITE_LABEL.md).
+For the full field reference and color pipeline docs, see [WHITE_LABEL.md](./WHITE_LABEL.md).
 
 ---
 
@@ -184,8 +203,6 @@ npm run test:jest
 npm run generate:colors     # Regenerate SCSS tokens from brand.config.json
 npm run verify:whitelabel   # Validate white-label setup
 
-# Analyze bundle sizes
-npm run analyze:bundle
 ```
 
 ---
@@ -208,7 +225,13 @@ The repository ships with GitHub Actions workflows ready to use:
 | `CLOUDFLARE_API_TOKEN`  | Cloudflare API token for Pages deployment |
 | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID                |
 
-**Optional variable** (Settings → Variables → Actions):
+**Required variables** (GitHub → Settings → Variables → Actions):
+
+| Variable                  | Description                        |
+| ------------------------- | ---------------------------------- |
+| `CLOUDFLARE_PROJECT_NAME` | Your Cloudflare Pages project name |
+
+**Optional variables** (Settings → Variables → Actions):
 
 | Variable               | Description                                                                          |
 | ---------------------- | ------------------------------------------------------------------------------------ |
@@ -235,7 +258,7 @@ git push origin production_v20240101
 ### Deriv OAuth Client ID
 
 1. Contact Deriv to register your OAuth2 client application
-2. Provide your redirect URIs (must match `brand_hostname` in `brand.config.json`)
+2. Provide your redirect URIs — these must match `auth.oauth_redirect_uri_staging` and `auth.oauth_redirect_uri_production` in `brand.config.json` exactly
 3. Set the returned `client_id` as `OAUTH_CLIENT_ID` in your `.env` or CI secrets
 
 Never commit the client ID to git — the app will throw an explicit error at startup if it is missing.
@@ -269,9 +292,10 @@ Everything in `brand.config.json` and `assets/brand/`:
 - All colors (full SCSS token pipeline regenerated automatically)
 - Logos (SVG files)
 - Platform name and description
-- OAuth redirect URIs
+- OAuth redirect URIs and optional v1 app ID (`auth.oauth_app_id`)
+- Deposit/transfer page URL (`deposit_url`)
 - Home and help centre URLs
-- App IDs
+- App IDs (WebSocket)
 - Feature flags (`dark_mode`, `language_switcher`)
 - Translation CDN URL
 
@@ -290,7 +314,7 @@ Everything in `brand.config.json` and `assets/brand/`:
 
 | Document                                                                                     | Description                                                                                                        |
 | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| [WHITE_LABEL.md](../WHITE_LABEL.md)                                                          | Full white-label guide with all config fields, logo requirements, color pipeline, OAuth setup, and troubleshooting |
+| [WHITE_LABEL.md](./WHITE_LABEL.md)                                                           | Full white-label guide with all config fields, logo requirements, color pipeline, OAuth setup, and troubleshooting |
 | [Stylesheet Guidelines](./Stylesheet/README.md)                                              | CSS/SCSS code style guidelines                                                                                     |
 | [JavaScript Guidelines](./JavaScript/README.md)                                              | JavaScript/TypeScript code style guidelines                                                                        |
 | [Architecture Analysis](./architecture/architecture-analysis.md)                             | System architecture, module dependencies, and design patterns                                                      |

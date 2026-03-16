@@ -10,4 +10,4 @@ Replace these placeholder SVG files with your own brand logos to white-label the
 
 These files are copied to `dist/brand/` at build time and served as static assets.
 
-See [WHITE_LABEL.md](../../WHITE_LABEL.md) for the full white-labeling guide.
+See [WHITE_LABEL.md](../../docs/WHITE_LABEL.md) for the full white-labeling guide.

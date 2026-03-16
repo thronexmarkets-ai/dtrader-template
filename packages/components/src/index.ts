@@ -81,7 +81,6 @@ export { default as TooltipPortal } from './components/tooltip-portal';
 export { default as UILoader } from './components/u-i-loader';
 export { default as VerticalTab } from './components/vertical-tab';
 export { default as VideoPlayer } from './components/video-player';
-export { default as InformationBanner } from './components/information-banner';
 export * from './hooks';
 export * from './components/types';
 export * from './utils/contract-helpers';

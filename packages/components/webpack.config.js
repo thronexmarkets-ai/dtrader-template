@@ -1,5 +1,4 @@
 const path = require('path');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = function () {
     return {
@@ -76,19 +75,7 @@ module.exports = function () {
                 publicPath: '/dist/',
             },
         },
-        plugins: [
-            ...(process.env.ANALYZE_BUNDLE
-                ? [
-                      new BundleAnalyzerPlugin({
-                          analyzerMode: 'static',
-                          reportFilename: path.resolve(__dirname, 'bundle-report.html'),
-                          openAnalyzer: false,
-                          generateStatsFile: true,
-                          statsFilename: path.resolve(__dirname, 'bundle-stats.json'),
-                      }),
-                  ]
-                : []),
-        ],
+        plugins: [],
         externals: [
             {
                 formik: 'formik',

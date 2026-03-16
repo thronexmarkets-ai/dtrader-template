@@ -81,7 +81,6 @@ The `@deriv/components` package is a foundational UI library that provides a wid
 - **ProgressSliderMobile** - Mobile progress slider
 - **Toast** - Toast notification component
 - **SwipeableNotification** - Swipeable notification
-- **InformationBanner** - Information banner component
 
 ### Utility Components
 

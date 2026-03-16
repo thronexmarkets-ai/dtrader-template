@@ -64,23 +64,9 @@ npm run stylelint:fix
 npm run prettify
 ```
 
-### Bundle Analysis
-
-```bash
-# Analyze all package bundles
-npm run analyze:bundle
-
-# Analyze specific package
-npm run analyze:bundle --workspace=@deriv/core
-# Generates bundle-report.html with size breakdown
-```
-
 ### Utilities
 
 ```bash
-# Check for circular imports
-npm run check-imports
-
 # Generate color tokens (run after editing brand.config.json colors)
 npm run generate:colors
 
@@ -129,7 +115,7 @@ This is a white-label template. All branding is driven by **`brand.config.json`*
 
 The platform connects to the Deriv WebSocket API (v3). Register your own App ID at [https://developers.deriv.com](https://developers.deriv.com) and set it in `brand.config.json` under `app_id.staging` and `app_id.production`.
 
-For full details, see [WHITE_LABEL.md](WHITE_LABEL.md).
+For full details, see [WHITE_LABEL.md](docs/WHITE_LABEL.md).
 
 ---
 
@@ -1000,9 +986,6 @@ Enables clean imports: `import App from 'App/index'` instead of `../../../App`
 
 ```bash
 npm run build              # Production build
-npm run build:analyze      # Build + bundle analysis
-npm run analyze:bundle     # Summary of all packages
-
 npm run serve             # Dev server with HMR
 npm run test              # Jest + ESLint + Stylelint
 ```
@@ -1262,15 +1245,6 @@ window.__deriv_store.client.email;
 window.__deriv_store.client.logout();
 ```
 
-### Build Optimization
-
-**Analyze bundle:**
-
-```bash
-npm run analyze:bundle --workspace=@deriv/core
-# Generates bundle-report.html with size breakdown
-```
-
 ---
 
 ## 10. Common Patterns & Code Organization
@@ -1390,12 +1364,6 @@ NODE_ENV=production
 - Wrap component with `observer()` HOC
 - Ensure you're mutating observable properties, not reassigning objects
 - Check MobX enforce actions: `configure({ enforceActions: 'observed' })`
-
-**Bundle size too large**
-
-- Run `npm run analyze:bundle` to identify culprits
-- Consider lazy-loading heavy deps (charts, ace editor)
-- Check for duplicate dependencies in package-lock.json
 
 **TypeScript errors in IDE**
 

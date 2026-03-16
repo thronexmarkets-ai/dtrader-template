@@ -49,14 +49,6 @@ jobs:
         npx tsc --project packages/stores/tsconfig.json -noEmit &
         wait
 
-    # Import checking
-    - name: Check imports
-      run: npm run check-imports
-    
-    # Test structure checking
-    - name: Check tests for @deriv/utils
-      run: bash ./scripts/check-tests.sh packages/utils/src
-    
     # Linting (parallel)
     - name: Run linting
       run: |

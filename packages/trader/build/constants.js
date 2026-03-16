@@ -9,7 +9,6 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const path = require('path');
 const StylelintPlugin = require('stylelint-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
@@ -142,21 +141,7 @@ const plugins = (base, is_test_env) => [
                   filter: file => file.name !== 'CNAME',
               }),
           ]),
-    ...(is_test_env
-        ? [new StylelintPlugin(stylelintConfig())]
-        : [
-              ...(process.env.ANALYZE_BUNDLE
-                  ? [
-                        new BundleAnalyzerPlugin({
-                            analyzerMode: 'static',
-                            reportFilename: path.resolve(__dirname, '../bundle-report.html'),
-                            openAnalyzer: false,
-                            generateStatsFile: true,
-                            statsFilename: path.resolve(__dirname, '../bundle-stats.json'),
-                        }),
-                    ]
-                  : []),
-          ]),
+    ...(is_test_env ? [new StylelintPlugin(stylelintConfig())] : []),
 ];
 
 module.exports = {
