@@ -1,5 +1,5 @@
 {
-    "brand_name": "Deriv",
+    "brand_name": "Trading Platform",
     "brand_logo": "brand/platform-logo.svg",
     "brand_logo_dark": "brand/platform-logo.svg",
     "brand_domain": "deriv.com",
@@ -8,7 +8,7 @@
         "production": "dtrader-template.pages.dev"
     },
     "platform": {
-        "name": "Derivatives Trader",
+        "name": "Trading Platform",
         "description": "A whole new trading experience on a powerful yet easy to use platform.",
         "logo": "brand/platform-logo.svg",
         "home_url": "https://home.deriv.com/dashboard",
@@ -47,7 +47,7 @@
         "production": 16929
     },
     "colors": {
-        "primary": "#ff444f",
+        "primary": "#118e1c",
         "secondary": "#85acb0",
         "tertiary": "#ff6b35",
         "success": "#4bb4b3",
@@ -64,7 +64,7 @@
         "darken_percentage": 10
     },
     "features": {
-        "dark_mode": false,
+        "dark_mode": true,
         "language_switcher": false
     }
 }
