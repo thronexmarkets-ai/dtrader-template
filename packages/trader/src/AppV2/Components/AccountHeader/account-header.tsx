@@ -86,12 +86,14 @@ const AccountHeader = observer(
 
         const accountTypeHeader = is_virtual ? localize('Demo account') : localize('Real account');
 
-        // Determine account types available
-        const hasOnlyDemoAccounts = accounts.length > 0 && accounts.every(acc => acc.account_type === 'demo');
+        // Determine account types available — only evaluate once data has loaded.
+        // While loading, accounts is [] which would incorrectly default to "Deposit".
+        const hasOnlyDemoAccounts =
+            !isLoading && accounts.length > 0 && accounts.every(acc => acc.account_type === 'demo');
 
         // Button logic:
         // - If only demo accounts exist -> show "Try real"
-        // - Otherwise (real only or both real and demo) -> show "Transfer"
+        // - Otherwise (real only or both real and demo) -> show "Deposit"
         const buttonLabel = hasOnlyDemoAccounts ? localize('Try real') : localize('Deposit');
 
         const handleTransferClick = () => {
