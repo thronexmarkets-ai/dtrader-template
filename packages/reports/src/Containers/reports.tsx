@@ -6,7 +6,6 @@ import { getSelectedRoute } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { useTranslations } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
-import { isAllowedRedirectDomain } from '@deriv/utils';
 
 import { TRoute } from 'Types';
 
@@ -25,127 +24,20 @@ const Reports = observer(({ history, location, routes }: TReports) => {
     const { is_logged_in, is_logging_in } = client;
     const { routeBackInApp } = common;
     const { is_reports_visible, setReportsTabIndex, toggleReports } = ui;
-    const { isMobile } = useDevice();
-
-    // Store the redirect parameter when component mounts to preserve it across tab navigation
-    const redirectUrlRef = React.useRef<string | null>(null);
-
-    // Ref to prevent duplicate analytics calls
-    const analyticsCalledRef = React.useRef<boolean>(false);
+    const { isDesktop } = useDevice();
 
     React.useEffect(() => {
-        // Capture redirect parameter on mount
-        const urlParams = new URLSearchParams(location.search);
-        const redirectUrl = urlParams.get('redirect');
-        if (redirectUrl) {
-            redirectUrlRef.current = redirectUrl;
-        }
-    }, []); // Only run on mount
-
-    React.useEffect(() => {
-        // Prevent duplicate analytics calls if component remounts
-        if (analyticsCalledRef.current) {
-            return;
-        }
-
-        analyticsCalledRef.current = true;
-
         toggleReports(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const onClickClose = () => {
         sessionStorage.removeItem('open_positions_filter');
-
-        // Check for stored redirect parameter
-        if (redirectUrlRef.current) {
-            // If redirect parameter exists, navigate to that URL
-            try {
-                // URL length validation (prevent DoS)
-                if (redirectUrlRef.current.length > 2048) {
-                    // eslint-disable-next-line no-console
-                    console.error('Security: Blocked excessively long redirect URL');
-                    routeBackInApp(history);
-                    return;
-                }
-
-                // Decode URL multiple times to handle double/triple encoding attacks
-                let decodedUrl = redirectUrlRef.current;
-                let previousUrl = '';
-                let decodeAttempts = 0;
-                const MAX_DECODE_ATTEMPTS = 5;
-
-                while (decodedUrl !== previousUrl && decodedUrl.includes('%') && decodeAttempts < MAX_DECODE_ATTEMPTS) {
-                    previousUrl = decodedUrl;
-                    try {
-                        decodedUrl = decodeURIComponent(decodedUrl);
-                        decodeAttempts++;
-                    } catch {
-                        // Invalid encoding, reject
-                        // eslint-disable-next-line no-console
-                        console.error('Security: Blocked redirect URL with invalid encoding');
-                        routeBackInApp(history);
-                        return;
-                    }
-                }
-
-                // Normalize and trim the URL
-                decodedUrl = decodedUrl.trim();
-
-                // Block dangerous protocols (XSS protection)
-                const BLOCKED_PROTOCOLS = ['javascript:', 'data:', 'vbscript:', 'file:', 'blob:'];
-                const safeUrl = decodedUrl.toLowerCase();
-
-                if (BLOCKED_PROTOCOLS.some(protocol => safeUrl.startsWith(protocol))) {
-                    // eslint-disable-next-line no-console
-                    console.error('Security: Blocked dangerous protocol in redirect URL:', safeUrl.split(':')[0]);
-                    routeBackInApp(history);
-                    return;
-                }
-
-                // Handle protocol-relative URLs
-                if (decodedUrl.startsWith('//')) {
-                    decodedUrl = `https:${decodedUrl}`;
-                }
-
-                // Add protocol if missing to ensure proper external navigation
-                if (!decodedUrl.startsWith('http://') && !decodedUrl.startsWith('https://')) {
-                    decodedUrl = `https://${decodedUrl}`;
-                }
-
-                // Validate domain whitelist (Open Redirect protection)
-                if (!isAllowedRedirectDomain(decodedUrl)) {
-                    // eslint-disable-next-line no-console
-                    console.error('Security: Blocked redirect to unauthorized domain');
-                    routeBackInApp(history);
-                    return;
-                }
-
-                window.location.href = decodedUrl;
-            } catch (error) {
-                // If any error occurs during validation, fall back to safe navigation
-                // eslint-disable-next-line no-console
-                console.error(
-                    'Security: Redirect validation error:',
-                    error instanceof Error ? error.message : 'Unknown error'
-                );
-                routeBackInApp(history);
-            }
-        } else {
-            // If no redirect parameter, use existing logic
-            routeBackInApp(history);
-        }
+        routeBackInApp(history);
     };
 
     const handleRouteChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        // Preserve redirect parameter when changing routes
-        const newPath = e.target.value;
-        if (redirectUrlRef.current) {
-            const redirectParam = `?redirect=${encodeURIComponent(redirectUrlRef.current)}`;
-            history.push(`${newPath}${redirectParam}`);
-        } else {
-            history.push(newPath);
-        }
+        history.push(e.target.value);
     };
 
     const menu_options = () => {
@@ -154,12 +46,7 @@ const Reports = observer(({ history, location, routes }: TReports) => {
             icon: route.icon_component,
             label: route.getTitle(),
             value: route.component,
-            // Keep path clean for React Router - don't include query parameters
             path: route.path,
-            // Store the full path with query params for navigation purposes
-            fullPath: redirectUrlRef.current
-                ? `${route.path}?redirect=${encodeURIComponent(redirectUrlRef.current)}`
-                : route.path,
         }));
     };
 
@@ -173,7 +60,7 @@ const Reports = observer(({ history, location, routes }: TReports) => {
         <FadeWrapper is_visible={is_reports_visible} className='reports-page-wrapper' keyname='reports-page-wrapper'>
             <div className='reports'>
                 <PageOverlay header={localize('Reports')} onClickClose={onClickClose}>
-                    {!isMobile ? (
+                    {isDesktop ? (
                         <VerticalTab
                             is_floating
                             current_path={location.pathname}
