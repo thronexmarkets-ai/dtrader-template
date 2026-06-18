@@ -9,9 +9,7 @@ const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
-// [AI]
 const config = JSON.parse(fs.readFileSync(path.join(ROOT, 'brand.config.json'), 'utf8'));
-// [/AI]
 
 const errors = [];
 const warnings = [];
@@ -52,14 +50,19 @@ if (config.brand_logo_dark && !config.brand_logo_dark.endsWith('.svg')) {
     errors.push(`brand_logo_dark must be an SVG file path ending in .svg (got: "${config.brand_logo_dark}")`);
 }
 
-// app_id must be numeric
+// ✅ FIXED: app_id accepts both number and string (alphanumeric)
 if (config.app_id) {
-    if (typeof config.app_id.staging !== 'number') {
-        errors.push(`app_id.staging must be a number (got: ${typeof config.app_id.staging})`);
+    const stagingType = typeof config.app_id.staging;
+    const prodType = typeof config.app_id.production;
+
+    if (stagingType !== 'number' && stagingType !== 'string') {
+        errors.push(`app_id.staging must be a number or string (got: ${stagingType})`);
     }
-    if (typeof config.app_id.production !== 'number') {
-        errors.push(`app_id.production must be a number (got: ${typeof config.app_id.production})`);
+    if (prodType !== 'number' && prodType !== 'string') {
+        errors.push(`app_id.production must be a number or string (got: ${prodType})`);
     }
+
+    // Warn if still using default 16929 (only if both are numeric and equal to 16929)
     if (config.app_id.staging === 16929 && config.app_id.production === 16929) {
         warnings.push(
             'app_id is still using the default Deriv app_id (16929). Register your own at https://api.deriv.com'
