@@ -45,6 +45,7 @@ const ALIASES = {
     Translations: path.resolve(__dirname, '../src/public/translations'),
     Types: path.resolve(__dirname, '../src/Types'),
     Utils: path.resolve(__dirname, '../src/Utils'),
+    root: path.resolve(__dirname, '../../../'), // <-- ADDED THIS LINE
 };
 
 const rules = (is_test_env = false) => [
