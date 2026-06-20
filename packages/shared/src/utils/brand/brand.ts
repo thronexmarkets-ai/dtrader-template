@@ -1,7 +1,7 @@
 // packages/shared/src/utils/brand/brand.ts
 // Patched to accept alphanumeric App IDs and add missing logo fallback
 
-import configData from '../../../../brand.config.json';
+import configData from 'root/brand.config.json';
 
 const isProduction = (): boolean => {
     // Detect production environment (you can customize this logic)
