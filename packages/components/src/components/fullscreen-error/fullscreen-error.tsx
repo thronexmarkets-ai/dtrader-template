@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { getBrandHomeUrl } from '@deriv/shared';
+import { getHomeUrl } from '@deriv/shared';
 import { Localize } from '@deriv-com/translations';
 
 import Button from '../button';
@@ -17,7 +17,7 @@ const FullscreenError = ({ error_message }: TFullscreenError) => {
         if (error_message) {
             window.location.reload();
         } else {
-            window.location.href = getBrandHomeUrl();
+            window.location.href = getHomeUrl();
         }
     };
 

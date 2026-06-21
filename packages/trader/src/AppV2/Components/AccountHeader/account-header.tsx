@@ -6,7 +6,7 @@ import { useDerivativesAccount, useMobileBridge } from '@deriv/api';
 import { Button, Skeleton, Text } from '@deriv/components';
 import AccountSwitcher from '@deriv/core/src/App/Components/Layout/Header/account-switcher';
 import { LegacyChevronDown1pxIcon } from '@deriv/quill-icons';
-import { addComma, getDepositUrl, getCurrencyDisplayCode, getSignupUrl, redirectToLogin } from '@deriv/shared';
+import { addComma, getDepositUrl, getCurrencyDisplayCode, getHomeUrl, redirectToLogin } from '@deriv/shared';
 import { useStore } from '@deriv/stores';
 import { Localize, useTranslations } from '@deriv-com/translations';
 import { useDevice } from '@deriv-com/ui';
@@ -177,7 +177,7 @@ const AccountHeader = observer(
             const handleLoginClick = async () => {
                 await redirectToLogin(common.current_language);
             };
-            const signup_url = getSignupUrl();
+            const signup_url = `${getHomeUrl()}/signup`;
 
             return (
                 <div className='account-header'>

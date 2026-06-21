@@ -1,5 +1,13 @@
 import React from 'react';
-import { DragDropContext, Draggable, DragStart, Droppable, DropResult } from 'react-beautiful-dnd';
+import {
+    DragDropContext,
+    Draggable,
+    DragStart,
+    Droppable,
+    DropResult,
+    DroppableProvided,
+    DraggableProvided,
+} from 'react-beautiful-dnd';
 
 import DraggableListItem from './draggable-list-item';
 
@@ -67,7 +75,7 @@ const DraggableCategory: React.FC<{
 }> = ({ category, draggedItemId, onRightIconClick, show_editing_divider }) => (
     <div className={show_editing_divider ? 'draggable-list-category' : ''}>
         <Droppable droppableId={category.id}>
-            {provided => (
+            {(provided: DroppableProvided) => (
                 <div
                     {...provided.droppableProps}
                     ref={provided.innerRef}
@@ -96,7 +104,7 @@ const DraggableCategoryItems: React.FC<{
                 (item, index) =>
                     item.id && (
                         <Draggable key={item.id} draggableId={item.id} index={index}>
-                            {provided => (
+                            {(provided: DraggableProvided) => (
                                 <div
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}

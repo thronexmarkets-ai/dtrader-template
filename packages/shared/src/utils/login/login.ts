@@ -1,7 +1,21 @@
-import { getAuthBaseUrl, getOAuthAppId, getOAuthClientId, getOAuthRedirectUri, getSignupUrl } from '../brand';
+// packages/shared/src/utils/login/login.ts
+import { getApiBaseUrl, getHomeUrl } from '../brand';
 
 // ---------------------------------------------------------------------------
-// PKCE helpers (duplicated here to avoid circular dependency with core)
+// OAuth configuration (fallback to environment variables)
+// ---------------------------------------------------------------------------
+const getOAuthAppId = (): string => process.env.OAUTH_APP_ID || '';
+const getOAuthClientId = (): string => process.env.OAUTH_CLIENT_ID || '';
+const getOAuthRedirectUri = (): string => process.env.OAUTH_REDIRECT_URI || '';
+
+// Auth base URL – use the API base (assumes same domain)
+const getAuthBaseUrl = (): string => getApiBaseUrl();
+
+// Signup URL – construct from home URL
+const getSignupUrl = (): string => `${getHomeUrl()}/signup`;
+
+// ---------------------------------------------------------------------------
+// PKCE helpers
 // ---------------------------------------------------------------------------
 
 const generateCodeVerifier = (): string => {
@@ -35,11 +49,6 @@ const storePKCEVerifier = (verifier: string): void => {
 // Public API
 // ---------------------------------------------------------------------------
 
-/**
- * Redirects to the OAuth2 authorize endpoint using PKCE.
- * Uses window.location.replace() so the authorize URL does not appear
- * in browser history (prevents back-button returning to a broken state).
- */
 export const redirectToLogin = async (_language?: string): Promise<void> => {
     const verifier = generateCodeVerifier();
     const challenge = await generateCodeChallenge(verifier);

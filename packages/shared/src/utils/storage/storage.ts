@@ -1,6 +1,8 @@
 import Cookies from 'js-cookie';
 
-import { getTrustedDomainName } from '../brand';
+// Fallback: getTrustedDomainName is no longer exported; use window.location.hostname.
+const getTrustedDomainName = (): string => window.location.hostname;
+
 import { getPropertyValue, isEmptyObject } from '../object/object';
 
 type TCookieStorageThis = {

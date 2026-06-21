@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { getBrandUrl, isEmptyObject, isValidToCancel, routes } from '@deriv/shared';
+import { getHomeUrl, isEmptyObject, isValidToCancel, routes } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { SnackbarController, useSnackbar } from '@deriv-com/quill-ui';
 import { useTranslations } from '@deriv-com/translations';
@@ -53,7 +53,7 @@ const ServicesErrorSnackbar = observer(() => {
             : '48px';
     const action_props = {
         actionText: localize('View'),
-        onActionClick: () => window.open(`${getBrandUrl()}/tnc/trading-terms.pdf`),
+        onActionClick: () => window.open(`${getHomeUrl()}/tnc/trading-terms.pdf`),
     };
 
     React.useEffect(() => {

@@ -51,9 +51,7 @@ const RouteWithSubRoutes = ({
         if (Component === Redirect) {
             let redirect_to = to;
 
-            // This if clause has been added just to remove '/index' from url in localhost env.
             if (path === shared_routes.index) {
-                /* eslint-disable react/prop-types */
                 const { location } = props;
                 redirect_to = location.pathname.toLowerCase().replace(path, '');
             }
@@ -71,9 +69,16 @@ const RouteWithSubRoutes = ({
             const is_valid_route = validateRoute(pathname);
             const should_redirect = !Component404;
 
+            // ✅ Fixed: ensure default_subroute.path is a string (not an array)
+            const redirectPath = default_subroute
+                ? Array.isArray(default_subroute.path)
+                    ? default_subroute.path[0]
+                    : default_subroute.path || '/'
+                : '/';
+
             result = (
                 <React.Fragment>
-                    {default_subroute && pathname === path && <Redirect to={default_subroute.path} />}
+                    {default_subroute && pathname === path && <Redirect to={redirectPath} />}
                     {is_valid_route ? (
                         <Component {...props} routes={routes} />
                     ) : (
@@ -94,6 +99,6 @@ const RouteWithSubRoutes = ({
     return <Route exact={exact} path={path} render={renderFactory} />;
 };
 
-export { RouteWithSubRoutes as RouteWithSubRoutesRender }; // For tests
+export { RouteWithSubRoutes as RouteWithSubRoutesRender };
 
 export default RouteWithSubRoutes;

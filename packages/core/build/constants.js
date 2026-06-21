@@ -3,7 +3,8 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const HtmlWebpackTagsPlugin = require('html-webpack-tags-plugin');
-const PreloadWebpackPlugin = require('preload-webpack-plugin');
+// ✅ REPLACED with Webpack 5 compatible fork
+const PreloadWebpackPlugin = require('preload-webpack-plugin-stzhang');
 const { IgnorePlugin, DefinePlugin } = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
@@ -126,8 +127,8 @@ const plugins = ({ base, is_test_env }) => {
     return [
         new Dotenv({
             path: path.resolve(__dirname, '../../../.env'),
-            systemvars: true, // also read from actual environment (CI secrets, shell exports)
-            silent: true, // don't error if .env file is missing (CI won't have one)
+            systemvars: true,
+            silent: true,
         }),
         new DefinePlugin({
             'process.env.REF_NAME': JSON.stringify(process.env.REF_NAME),

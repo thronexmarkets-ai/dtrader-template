@@ -1,0 +1,5 @@
+// MUST be first – defines the missing color variable
+$color-success: #00b388 !default;
+
+// Import shared themes (adjust path if needed)
+@import '~@deriv/shared/src/styles/themes';

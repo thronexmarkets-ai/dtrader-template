@@ -55,7 +55,7 @@ const VerticalTabHeaderGroup = ({
     return is_routed && !group.subitems ? (
         <NavLink
             id={id}
-            to={group.path}
+            to={group.path || '#'}
             className={classNames('dc-vertical-tab__header-group', className, {
                 'dc-vertical-tab__header-group--active': selected,
                 'dc-vertical-tab__header-group--disabled': is_disabled || selected,

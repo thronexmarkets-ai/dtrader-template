@@ -2,7 +2,7 @@ import React, { createContext, PropsWithChildren, useCallback, useContext, useEf
 
 // @ts-expect-error `@deriv/deriv-api` is not in TypeScript, Hence we ignore the TS error.
 import DerivAPIBasic from '@deriv/deriv-api/dist/DerivAPIBasic';
-import { getApiV4BaseUrl, getAccountType, useWS } from '@deriv/shared';
+import { getApiBaseUrl, getAccountType, useWS } from '@deriv/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import {
@@ -73,7 +73,7 @@ const getSharedQueryClientContext = (): QueryClient => {
 };
 
 const getPublicWSUrl = () => {
-    const base = getApiV4BaseUrl(); // e.g. "https://api.derivws.com"
+    const base = getApiBaseUrl(); // now using getApiBaseUrl
     return `${base.replace(/^https?:\/\//, 'wss://')}/trading/v1/options/ws/public`;
 };
 
@@ -242,7 +242,7 @@ const APIProvider = ({ children, standalone = false, ws_url }: PropsWithChildren
 
     const restAPIConfig: TRestAPIConfig = React.useMemo(() => {
         return {
-            baseUrl: getApiV4BaseUrl(),
+            baseUrl: getApiBaseUrl(), // now using getApiBaseUrl
         };
     }, []);
 

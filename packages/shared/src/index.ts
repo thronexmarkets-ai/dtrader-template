@@ -15,7 +15,8 @@ export * from './utils/hooks';
 export * from './utils/loader';
 export * from './utils/loader-handler';
 export * from './utils/location';
-export * from './utils/login';
+// DO NOT re-export entire login module – it would duplicate names with brand
+export { redirectToLogin, redirectToSignUp } from './utils/login';
 export * from './utils/object';
 export * from './utils/os';
 export * from './utils/platform';

@@ -1,6 +1,6 @@
 import { action, intercept, makeObservable, observable, reaction, toJS, when } from 'mobx';
 
-import { isEmptyObject, isProduction, Validator } from '@deriv/shared';
+import { isEmptyObject, Validator } from '@deriv/shared';
 
 import { TRootStore } from 'Types';
 
@@ -324,7 +324,7 @@ export default class BaseStore {
                 } catch (error) {
                     // there is no listener currently active. so we can just ignore the error raised from treating
                     // a null object as a function. Although, in development mode, we throw a console error.
-                    if (!isProduction()) {
+                    if (process.env.NODE_ENV !== 'production') {
                         console.error(error); // eslint-disable-line
                     }
                 }
@@ -350,7 +350,7 @@ export default class BaseStore {
                 } catch (error) {
                     // there is no listener currently active. so we can just ignore the error raised from treating
                     // a null object as a function. Although, in development mode, we throw a console error.
-                    if (!isProduction()) {
+                    if (process.env.NODE_ENV !== 'production') {
                         console.error(error); // eslint-disable-line
                     }
                 }
@@ -368,7 +368,7 @@ export default class BaseStore {
                 } catch (error) {
                     // there is no listener currently active. so we can just ignore the error raised from treating
                     // a null object as a function. Although, in development mode, we throw a console error.
-                    if (!isProduction()) {
+                    if (process.env.NODE_ENV !== 'production') {
                         console.error(error); // eslint-disable-line
                     }
                 }
@@ -387,7 +387,7 @@ export default class BaseStore {
                 } catch (error) {
                     // there is no listener currently active. so we can just ignore the error raised from treating
                     // a null object as a function. Although, in development mode, we throw a console error.
-                    if (!isProduction()) {
+                    if (process.env.NODE_ENV !== 'production') {
                         console.error(error); // eslint-disable-line
                     }
                 }
@@ -414,7 +414,7 @@ export default class BaseStore {
                 } catch (error) {
                     // there is no listener currently active. so we can just ignore the error raised from treating
                     // a null object as a function. Although, in development mode, we throw a console error.
-                    if (!isProduction()) {
+                    if (process.env.NODE_ENV !== 'production') {
                         console.error(error); // eslint-disable-line
                     }
                 }

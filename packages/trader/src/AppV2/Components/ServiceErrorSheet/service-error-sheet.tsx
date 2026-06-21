@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { useMobileBridge } from '@deriv/api';
-import { getBrandUrl, isEmptyObject, mapErrorMessage, redirectToLogin, redirectToSignUp } from '@deriv/shared';
+import { getHomeUrl, isEmptyObject, mapErrorMessage, redirectToLogin, redirectToSignUp } from '@deriv/shared';
 import { observer, useStore } from '@deriv/stores';
 import { ActionSheet, Modal, Text } from '@deriv-com/quill-ui';
 import { Localize } from '@deriv-com/translations';
@@ -58,7 +58,7 @@ const ServiceErrorSheet = observer(() => {
                     content: <Localize i18n_default_text='Deposit now' />,
                     onAction: () => {
                         resetServicesError();
-                        const brandUrl = getBrandUrl();
+                        const brandUrl = getHomeUrl();
                         const lang_param = current_language ? `&lang=${current_language}` : '';
                         sendBridgeEvent('trading:transfer', () => {
                             window.location.href = `${brandUrl}/transfer?from=dtrader&source=options&acc=options&curr=${currency}${lang_param}`;

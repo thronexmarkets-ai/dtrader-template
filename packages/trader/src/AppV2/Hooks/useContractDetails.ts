@@ -15,8 +15,11 @@ const useContractDetails = () => {
 
     useEffect(() => {
         const urlContractId = location.pathname.split('/').pop();
-        if (urlContractId != contract_info.contract_id) {
-            onMount(parseInt(urlContractId));
+        if (urlContractId && urlContractId !== String(contract_info.contract_id)) {
+            const parsedId = parseInt(urlContractId, 10);
+            if (!isNaN(parsedId)) {
+                onMount(parsedId);
+            }
         }
     }, [location.pathname, onMount, onUnmount, contract_info.contract_id]);
 

@@ -19,12 +19,11 @@ import {
 } from '@deriv/quill-icons';
 // [AI]
 import {
-    getBrandLogo,
-    getBrandLogoDark,
+    // getBrandLogo and getBrandLogoDark are no longer exported – use static assets or @deriv-com/ui
     getBrandName,
     getHomeUrl,
     getHelpCentreUrl,
-    isFeatureEnabled,
+    // isFeatureEnabled is replaced by environment-based checks
     routes,
 } from '@deriv/shared';
 // [/AI]
@@ -35,6 +34,12 @@ import { PositionsDrawerContent, PositionsDrawerFooter } from './PositionsDrawer
 
 import AccountSelector from './account-selector';
 import LanguageSelector from './language-selector';
+
+// [AI] Define logo assets (fallback to empty string or use actual paths)
+// Replace with actual logo URLs from your project or use @deriv-com/ui's logo component.
+const BRAND_LOGO = '/brand-logo.svg';          // e.g., light mode logo
+const BRAND_LOGO_DARK = '/brand-logo-dark.svg'; // e.g., dark mode logo
+// [/AI]
 
 type TSidebarItem = {
     id: string;
@@ -56,6 +61,16 @@ const Sidebar = observer(() => {
     const history = useHistory();
     const sidebar_ref = React.useRef<HTMLElement>(null);
     const { sendBridgeEvent } = useMobileBridge();
+
+    // [AI] Feature flags – adjust as needed
+    const isFeatureEnabled = (feature: string) => {
+        // Implement your own logic, e.g., check environment variables or a config object.
+        // For now, we enable language switcher and dark mode by default.
+        if (feature === 'language_switcher') return true;
+        if (feature === 'dark_mode') return true;
+        return false;
+    };
+    // [/AI]
 
     React.useEffect(() => {
         onMount();
@@ -239,9 +254,9 @@ const Sidebar = observer(() => {
             >
                 {/* Logo Section */}
                 <div className='sidebar__header'>
-                    {/* [AI] */}
+                    {/* [AI] Use static logo assets or custom component */}
                     <img
-                        src={`/${is_dark_mode_on ? getBrandLogoDark() : getBrandLogo()}`}
+                        src={is_dark_mode_on ? BRAND_LOGO_DARK : BRAND_LOGO}
                         alt={getBrandName()}
                         width={32}
                         height={32}

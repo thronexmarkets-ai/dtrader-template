@@ -146,7 +146,7 @@ const ContractCard = ({
                 })}
                 onClick={onClick}
                 onDragStart={e => e.preventDefault()}
-                to={redirectTo}
+                to={redirectTo || '#'}
             >
                 <div className={`${className}__body`}>
                     <div className={`${className}__details`}>

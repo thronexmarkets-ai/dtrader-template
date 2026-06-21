@@ -16,7 +16,7 @@ const ButtonLink = ({
 }: React.PropsWithChildren<Partial<TButtonLinkProps>>) => (
     <Link
         className={classNames('dc-btn dc-btn--primary', className, 'effect', `dc-btn__${size}`)}
-        to={to}
+        to={to || '#'}
         onClick={onClick}
     >
         {children}

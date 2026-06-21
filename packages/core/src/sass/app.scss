@@ -1,3 +1,17 @@
+// ================================================================
+// Define missing color variables BEFORE importing shared styles
+// ================================================================
+$color-success: #00b388 !default;
+$color-danger: #ff4444 !default;
+$color-warning: #ffad00 !default;
+$color-info: #377cfc !default;
+$color-primary: #377cfc !default;
+$color-secondary: #6b7a8f !default;
+$color-dark: #1a1f2b !default;
+$color-light: #f8f9fc !default;
+$color-white: #ffffff !default;
+$color-black: #000000 !default;
+
 // Base
 @import 'app/_common/base/index';
 

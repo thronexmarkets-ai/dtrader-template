@@ -17,16 +17,23 @@
     "auth": {
         "production": "https://auth.deriv.com",
         "oauth_scopes": ["trade", "account_manage"],
-        "oauth_redirect_uri_production": "https://trade.thronexmarkets.org"
+        "oauth_redirect_uri_production": "https://trade.thronexmarkets.org",
+        "oauth_redirect_uri_staging": "https://staging.trade.thronexmarkets.org",
+        "oauth_client_id": "your-oauth-client-id",
+        "signup_url": "https://portal.thronexmarkets.org/signup",
+        "trusted_domain": "thronexmarkets.org"
     },
     "app_id": {
-        "production": "33Anjt8nnXwK48xRpAvrs"
+        "production": "33Anjt8nnXwK48xRpAvrs",
+        "staging": "33Anjt8nnXwK48xRpAvrs"
     },
     "api": {
-        "production": "https://api.thronexmarkets.org"
+        "production": "https://api.thronexmarkets.org",
+        "staging": "https://staging-api.thronexmarkets.org"
     },
     "api_core": {
-        "production": "https://api.thronexmarkets.org"
+        "production": "https://api.thronexmarkets.org",
+        "staging": "https://staging-api.thronexmarkets.org"
     },
     "colors": {
         "primary": "#FACC15",

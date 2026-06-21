@@ -66,7 +66,7 @@ const ContractReplay = observer(({ contract_id }: { contract_id: number }) => {
     const onClickClose = React.useCallback(() => {
         setIsVisible(false);
         const is_from_table_row = !isEmptyObject(state) ? state.from_table_row : false;
-        return is_from_table_row ? history.goBack() : routeBackInApp(history);
+        return is_from_table_row ? history.goBack() : routeBackInApp(history as any);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [history, routeBackInApp]);
 

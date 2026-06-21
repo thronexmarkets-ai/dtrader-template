@@ -14,10 +14,10 @@ const ContractDetailsHeader = observer(() => {
     const { routeBackInApp } = common;
 
     const handleBack = () => {
-        const is_from_table_row = !isEmptyObject(state) ? state.from_table_row : false;
+        const is_from_table_row = !isEmptyObject(state) ? (state as any).from_table_row : false;
         return is_from_table_row
             ? history.goBack()
-            : routeBackInApp(history as unknown as Parameters<typeof routeBackInApp>[0]);
+            : routeBackInApp(history as any);
     };
 
     return (

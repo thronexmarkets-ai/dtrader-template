@@ -7,7 +7,7 @@
  *
  */
 
-import { getWebSocketURL } from '../brand';
+import { getApiBaseUrl } from '../brand';
 
 /**
  * Gets account_type with priority: URL parameter > localStorage > default 'public'
@@ -105,9 +105,10 @@ export const getSocketURL = () => {
         window.localStorage.removeItem('config.server_url');
     }
 
-    // Get WebSocket server URL from brand config based on environment
-    const server_url = getWebSocketURL();
-
+    // Get WebSocket server hostname from the API base URL
+    const apiBaseUrl = getApiBaseUrl();
+    // Extract hostname from the API base URL (e.g., "api.derivws.com")
+    const server_url = new URL(apiBaseUrl).hostname;
     return server_url;
 };
 
