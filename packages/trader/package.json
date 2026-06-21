@@ -7,7 +7,8 @@
   "scripts": {
     "start": "npm run test && npm run serve",
     "serve": "webpack --progress --watch --config \"./build/webpack.config.js\"",
-    "build": "webpack --config ./build/webpack.config.js --env base=production",
+    "build": "webpack --config ./build/webpack.config.js --env base=production && npm run postbuild",
+    "postbuild": "cp -r ../core/dist/. ./dist/ || echo \"No core dist\" && cp -r ../components/dist/. ./dist/ || echo \"No components dist\" && cp -r ../reports/dist/. ./dist/ || echo \"No reports dist\"",
     "test:eslint": "eslint \"./src/**/*.?(js|jsx|ts|tsx)\""
   },
   "engines": {
